@@ -1,7 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="BranchesTreeState">
+    <expand>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </expand>
+    <select />
+  </component>
   <component name="ChangeListManager">
-    <list default="true" id="bc71b261-7950-43ee-beed-59e9b8a1e829" name="Default Changelist" comment="" />
+    <list default="true" id="bc71b261-7950-43ee-beed-59e9b8a1e829" name="Default Changelist" comment="first push;">
+      <change afterPath="$PROJECT_DIR$/.env" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Command/Doctrinator.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/services.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/config/services.yaml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -62,7 +85,7 @@
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../insitu" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="vue.rearranger.settings.migration" value="true" />
@@ -75,17 +98,64 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1604932111394</updated>
-      <workItem from="1604932112439" duration="10000" />
+      <workItem from="1604932112439" duration="4733000" />
     </task>
+    <task id="LOCAL-00001" summary="first push;">
+      <created>1604932142201</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1604932142201</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="first push;" />
+    <option name="LAST_COMMIT_MESSAGE" value="first push;" />
   </component>
   <component name="WindowStateProjectService">
     <state x="733" y="432" width="444" height="249" key="#Composer" timestamp="1604932121636">
       <screen x="0" y="27" width="1920" height="1053" />
     </state>
     <state x="733" y="432" width="444" height="249" key="#Composer/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1604932121636" />
+    <state x="743" y="311" width="424" height="491" key="FileChooserDialogImpl" timestamp="1604932905515">
+      <screen x="0" y="27" width="1920" height="1053" />
+    </state>
+    <state x="743" y="311" width="424" height="491" key="FileChooserDialogImpl/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1604932905515" />
+    <state x="654" y="273" width="601" height="568" key="NewPhpClassDialog" timestamp="1604932365842">
+      <screen x="0" y="27" width="1920" height="1053" />
+    </state>
+    <state x="654" y="273" width="601" height="568" key="NewPhpClassDialog/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1604932365842" />
+    <state x="755" y="479" width="399" height="156" key="NewPhpFileDialog" timestamp="1604932385068">
+      <screen x="0" y="27" width="1920" height="1053" />
+    </state>
+    <state x="755" y="479" width="399" height="156" key="NewPhpFileDialog/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1604932385068" />
+    <state x="555" y="275" width="800" height="563" key="Vcs.Push.Dialog.v2" timestamp="1604932150384">
+      <screen x="0" y="27" width="1920" height="1053" />
+    </state>
+    <state x="555" y="275" width="800" height="563" key="Vcs.Push.Dialog.v2/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1604932150384" />
+    <state x="651" y="292" width="618" height="522" key="find.popup" timestamp="1604935450285">
+      <screen x="0" y="27" width="1920" height="1053" />
+    </state>
+    <state x="651" y="292" width="618" height="522" key="find.popup/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1604935450285" />
+    <state x="623" y="259" width="672" height="678" key="search.everywhere.popup" timestamp="1604936526502">
+      <screen x="0" y="27" width="1920" height="1053" />
+    </state>
+    <state x="623" y="259" width="672" height="678" key="search.everywhere.popup/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1604936526502" />
   </component>
 </project>
