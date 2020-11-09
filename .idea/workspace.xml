@@ -19,11 +19,10 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="bc71b261-7950-43ee-beed-59e9b8a1e829" name="Default Changelist" comment="first push;">
-      <change afterPath="$PROJECT_DIR$/.env" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Command/Doctrinator.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/services.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/config/services.yaml" afterDir="false" />
+    <list default="true" id="bc71b261-7950-43ee-beed-59e9b8a1e829" name="Default Changelist" comment="adds env; adds error output if directory is not given and install is not used as an option;">
+      <change beforePath="$PROJECT_DIR$/composer.json" beforeDir="false" afterPath="$PROJECT_DIR$/composer.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/composer.lock" beforeDir="false" afterPath="$PROJECT_DIR$/composer.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Command/Doctrinator.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Command/Doctrinator.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -98,7 +97,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1604932111394</updated>
-      <workItem from="1604932112439" duration="4733000" />
+      <workItem from="1604932112439" duration="9463000" />
     </task>
     <task id="LOCAL-00001" summary="first push;">
       <created>1604932142201</created>
@@ -107,7 +106,14 @@
       <option name="project" value="LOCAL" />
       <updated>1604932142201</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="adds env; adds error output if directory is not given and install is not used as an option;">
+      <created>1604936895212</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1604936895212</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -126,7 +132,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="first push;" />
-    <option name="LAST_COMMIT_MESSAGE" value="first push;" />
+    <MESSAGE value="adds env; adds error output if directory is not given and install is not used as an option;" />
+    <option name="LAST_COMMIT_MESSAGE" value="adds env; adds error output if directory is not given and install is not used as an option;" />
   </component>
   <component name="WindowStateProjectService">
     <state x="733" y="432" width="444" height="249" key="#Composer" timestamp="1604932121636">
@@ -145,10 +152,14 @@
       <screen x="0" y="27" width="1920" height="1053" />
     </state>
     <state x="755" y="479" width="399" height="156" key="NewPhpFileDialog/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1604932385068" />
-    <state x="555" y="275" width="800" height="563" key="Vcs.Push.Dialog.v2" timestamp="1604932150384">
+    <state x="555" y="275" width="800" height="563" key="Vcs.Push.Dialog.v2" timestamp="1604936897815">
       <screen x="0" y="27" width="1920" height="1053" />
     </state>
-    <state x="555" y="275" width="800" height="563" key="Vcs.Push.Dialog.v2/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1604932150384" />
+    <state x="555" y="275" width="800" height="563" key="Vcs.Push.Dialog.v2/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1604936897815" />
+    <state x="741" y="468" width="428" height="177" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1604938946812">
+      <screen x="0" y="27" width="1920" height="1053" />
+    </state>
+    <state x="741" y="468" width="428" height="177" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1604938946812" />
     <state x="651" y="292" width="618" height="522" key="find.popup" timestamp="1604935450285">
       <screen x="0" y="27" width="1920" height="1053" />
     </state>
