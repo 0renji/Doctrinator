@@ -1,2 +1,2 @@
 # Doctrinator
-CLI for transitioning codeigniter instances to doctrine readable template instances
+CLI for transitioning codeigniter instances in a template manner to doctrine readable instances
