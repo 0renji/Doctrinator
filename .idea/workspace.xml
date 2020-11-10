@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="BranchesTreeState">
     <expand>
       <path>
@@ -19,24 +22,32 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="bc71b261-7950-43ee-beed-59e9b8a1e829" name="Default Changelist" comment="adds env; adds error output if directory is not given and install is not used as an option;">
+    <list default="true" id="bc71b261-7950-43ee-beed-59e9b8a1e829" name="Default Changelist" comment="adds checks for the ignore file with a working install;">
+      <change afterPath="$PROJECT_DIR$/src/Helpers/NodeTraversal/TypesConverter.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Helpers/doctrineHelper.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Helpers/logHelper.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Helpers/outputHelper.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/Doctrinator.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Doctrinator.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/php.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/php.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/composer.json" beforeDir="false" afterPath="$PROJECT_DIR$/composer.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/composer.lock" beforeDir="false" afterPath="$PROJECT_DIR$/composer.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Command/Doctrinator.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Command/Doctrinator.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/symfony.lock" beforeDir="false" afterPath="$PROJECT_DIR$/symfony.lock" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="ComposerSettings" synchronizationState="SYNCHRONIZE">
+  <component name="ComposerSettings" doNotAsk="true" synchronizationState="SYNCHRONIZE">
     <pharConfigPath>$PROJECT_DIR$/composer.json</pharConfigPath>
     <execution />
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="PhpWorkspaceProjectConfiguration">
+  <component name="PhpWorkspaceProjectConfiguration" interpreter_name="PHP 7.4">
     <include_path>
       <path value="$PROJECT_DIR$/vendor/symfony/string" />
       <path value="$PROJECT_DIR$/vendor/symfony/cache-contracts" />
@@ -74,6 +85,8 @@
       <path value="$PROJECT_DIR$/vendor/symfony/dependency-injection" />
       <path value="$PROJECT_DIR$/vendor/symfony/http-foundation" />
       <path value="$PROJECT_DIR$/vendor/symfony/polyfill-php73" />
+      <path value="$PROJECT_DIR$/vendor/symfony/property-info" />
+      <path value="$PROJECT_DIR$/vendor/nikic/php-parser" />
     </include_path>
   </component>
   <component name="ProjectId" id="1k3bEd6C3J17lpLvouzWly3zs3g" />
@@ -84,10 +97,26 @@
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../insitu" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/bin/console" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
+    <property name="php.override.implement.member.chooser.php.doc" value="DEFAULT" />
     <property name="vue.rearranger.settings.migration" value="true" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="PhpScript" type="PhpLocalRunConfigurationType" factoryName="PHP Console" path="$PROJECT_DIR$/bin/console" scriptParameters="app:doctrinator $USER_HOME$/Desktop/ $USER_HOME$/Desktop ">
+      <CommandLine>
+        <PhpTestInterpreterSettings>
+          <option name="interpreterName" value="PHP 7.4" />
+        </PhpTestInterpreterSettings>
+      </CommandLine>
+      <method v="2" />
+    </configuration>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -97,7 +126,8 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1604932111394</updated>
-      <workItem from="1604932112439" duration="9463000" />
+      <workItem from="1604932112439" duration="9496000" />
+      <workItem from="1604995461657" duration="20743000" />
     </task>
     <task id="LOCAL-00001" summary="first push;">
       <created>1604932142201</created>
@@ -113,7 +143,14 @@
       <option name="project" value="LOCAL" />
       <updated>1604936895212</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="adds checks for the ignore file with a working install;">
+      <created>1604941605835</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1604941605835</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -129,44 +166,107 @@
         </entry>
       </map>
     </option>
+    <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="first push;" />
     <MESSAGE value="adds env; adds error output if directory is not given and install is not used as an option;" />
-    <option name="LAST_COMMIT_MESSAGE" value="adds env; adds error output if directory is not given and install is not used as an option;" />
+    <MESSAGE value="adds checks for the ignore file with a working install;" />
+    <option name="LAST_COMMIT_MESSAGE" value="adds checks for the ignore file with a working install;" />
   </component>
   <component name="WindowStateProjectService">
+    <state x="2458" y="220" width="824" height="691" key="#CLI_Interpreters" timestamp="1605011960823">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state x="2458" y="220" width="824" height="691" key="#CLI_Interpreters/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605011960823" />
     <state x="733" y="432" width="444" height="249" key="#Composer" timestamp="1604932121636">
       <screen x="0" y="27" width="1920" height="1053" />
     </state>
     <state x="733" y="432" width="444" height="249" key="#Composer/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1604932121636" />
-    <state x="743" y="311" width="424" height="491" key="FileChooserDialogImpl" timestamp="1604932905515">
-      <screen x="0" y="27" width="1920" height="1053" />
+    <state x="2525" y="183" width="700" height="759" key="#PHP" timestamp="1605011753837">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state x="2525" y="183" width="700" height="759" key="#PHP/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605011753837" />
+    <state x="2338" y="198" width="1084" height="746" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1605012094494">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state x="2338" y="198" width="1084" height="746" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605012094494" />
+    <state x="2669" y="221" width="412" height="645" key="#com.intellij.ide.util.MemberChooser" timestamp="1605002170792">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state x="2669" y="221" width="412" height="645" key="#com.intellij.ide.util.MemberChooser/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605002170792" />
+    <state x="2613" y="298" width="524" height="491" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog" timestamp="1605002165174">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state x="2613" y="298" width="524" height="491" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605002165174" />
+    <state x="2663" y="291" width="424" height="491" key="FileChooserDialogImpl" timestamp="1605012025690">
+      <screen x="1920" y="0" width="1920" height="1080" />
     </state>
     <state x="743" y="311" width="424" height="491" key="FileChooserDialogImpl/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1604932905515" />
-    <state x="654" y="273" width="601" height="568" key="NewPhpClassDialog" timestamp="1604932365842">
-      <screen x="0" y="27" width="1920" height="1053" />
+    <state x="2663" y="291" width="424" height="491" key="FileChooserDialogImpl/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605012025690" />
+    <state width="1874" height="411" key="GridCell.Tab.0.bottom" timestamp="1605028460020">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state width="1874" height="411" key="GridCell.Tab.0.bottom/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605028460020" />
+    <state width="1874" height="411" key="GridCell.Tab.0.center" timestamp="1605028460020">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state width="1874" height="411" key="GridCell.Tab.0.center/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605028460020" />
+    <state width="1874" height="411" key="GridCell.Tab.0.left" timestamp="1605028460020">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state width="1874" height="411" key="GridCell.Tab.0.left/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605028460020" />
+    <state width="1874" height="411" key="GridCell.Tab.0.right" timestamp="1605028460020">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state width="1874" height="411" key="GridCell.Tab.0.right/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605028460020" />
+    <state width="1874" height="411" key="GridCell.Tab.1.bottom" timestamp="1605028459958">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state width="1874" height="411" key="GridCell.Tab.1.bottom/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605028459958" />
+    <state width="1874" height="411" key="GridCell.Tab.1.center" timestamp="1605028459958">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state width="1874" height="411" key="GridCell.Tab.1.center/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605028459958" />
+    <state width="1874" height="411" key="GridCell.Tab.1.left" timestamp="1605028459958">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state width="1874" height="411" key="GridCell.Tab.1.left/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605028459958" />
+    <state width="1874" height="411" key="GridCell.Tab.1.right" timestamp="1605028459958">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state width="1874" height="411" key="GridCell.Tab.1.right/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605028459958" />
+    <state x="2574" y="252" width="601" height="590" key="NewPhpClassDialog" timestamp="1605012475750">
+      <screen x="1920" y="0" width="1920" height="1080" />
     </state>
     <state x="654" y="273" width="601" height="568" key="NewPhpClassDialog/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1604932365842" />
-    <state x="755" y="479" width="399" height="156" key="NewPhpFileDialog" timestamp="1604932385068">
-      <screen x="0" y="27" width="1920" height="1053" />
+    <state x="2574" y="252" width="601" height="590" key="NewPhpClassDialog/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605012475750" />
+    <state x="2675" y="464" width="399" height="156" key="NewPhpFileDialog" timestamp="1605019882807">
+      <screen x="1920" y="0" width="1920" height="1080" />
     </state>
     <state x="755" y="479" width="399" height="156" key="NewPhpFileDialog/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1604932385068" />
-    <state x="555" y="275" width="800" height="563" key="Vcs.Push.Dialog.v2" timestamp="1604936897815">
+    <state x="2675" y="464" width="399" height="156" key="NewPhpFileDialog/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605019882807" />
+    <state x="555" y="275" width="800" height="563" key="Vcs.Push.Dialog.v2" timestamp="1604941608097">
       <screen x="0" y="27" width="1920" height="1053" />
     </state>
-    <state x="555" y="275" width="800" height="563" key="Vcs.Push.Dialog.v2/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1604936897815" />
+    <state x="555" y="275" width="800" height="563" key="Vcs.Push.Dialog.v2/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1604941608097" />
+    <state x="2020" y="100" width="1720" height="880" key="com.intellij.history.integration.ui.views.FileHistoryDialog" timestamp="1605028024768">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state x="2020" y="100" width="1720" height="880" key="com.intellij.history.integration.ui.views.FileHistoryDialog/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605028024768" />
     <state x="741" y="468" width="428" height="177" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1604938946812">
       <screen x="0" y="27" width="1920" height="1053" />
     </state>
     <state x="741" y="468" width="428" height="177" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1604938946812" />
-    <state x="651" y="292" width="618" height="522" key="find.popup" timestamp="1604935450285">
-      <screen x="0" y="27" width="1920" height="1053" />
+    <state x="2571" y="272" width="618" height="536" key="find.popup" timestamp="1605000173245">
+      <screen x="1920" y="0" width="1920" height="1080" />
     </state>
     <state x="651" y="292" width="618" height="522" key="find.popup/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1604935450285" />
-    <state x="623" y="259" width="672" height="678" key="search.everywhere.popup" timestamp="1604936526502">
-      <screen x="0" y="27" width="1920" height="1053" />
+    <state x="2571" y="272" width="618" height="536" key="find.popup/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605000173245" />
+    <state x="2543" y="238" width="672" height="696" key="search.everywhere.popup" timestamp="1605027328936">
+      <screen x="1920" y="0" width="1920" height="1080" />
     </state>
     <state x="623" y="259" width="672" height="678" key="search.everywhere.popup/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1604936526502" />
+    <state x="2543" y="238" width="672" height="696" key="search.everywhere.popup/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605027328936" />
   </component>
 </project>
