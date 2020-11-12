@@ -1,9 +1,10 @@
 <?php
 namespace App\Command;
 
+use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 use PhpParser\Node;
 use PhpParser\Error;
-use PhpParser\NodeDumper;
 use PhpParser\NodeFinder;
 use PhpParser\ParserFactory;
 use RecursiveIteratorIterator;
@@ -18,19 +19,31 @@ use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Iterator\RecursiveDirectoryIterator;
 use App\Helpers\doctrineHelper;
-use App\Helpers\logHelper;
 use App\Helpers\outputHelper;
 use Symfony\Component\Yaml\Yaml;
 
 class Doctrinator extends Command
 {
     protected static $defaultName = 'app:doctrinator';
-    protected $ignoreFilepath = null;
-    protected $logFilepath = null;
-    protected $destinationDirectory = null;
+    private $ignoreFilepath;
+    private $logger;
+    private $formatter;
+    private $outputHelper;
+    private $doctrineHelper;
+    private $sourceDirectory;
+    private $destinationDirectory;
+    private $filesystem;
 
-    protected $filesystem = null;
+    public function __construct(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+        $this->outputHelper = new outputHelper();
+        $this->doctrineHelper = new doctrineHelper();
+        $this->filesystem = new Filesystem();
+        $this->ignoreFilepath = sys_get_temp_dir().'/'.'ignore.yaml';
 
+        parent::__construct();
+    }
 
     protected function configure(){
         $this
@@ -44,22 +57,19 @@ class Doctrinator extends Command
     /**
      * @param InputInterface $input
      * @param OutputInterface $output
-     * @param FormatterHelper $formatter
-     * @param outputHelper $outputter
      * @return int
      */
-    protected function handleArguments(InputInterface $input, OutputInterface $output, FormatterHelper $formatter, outputHelper $outputter) {
-        // TODO check if destination and source are the same -> can't be! because of same file names
+    protected function handleArguments(InputInterface $input, OutputInterface $output) {
         // check of install is required
         // fill ignoreFile with the working ignore file pointer with readonly
         if ($input->getOption('install')) {
-            return $this->install($output, $outputter, $formatter);
+            return $this->install($output);
         }
         // check if the ignore path is given, and if the path works, then fill the FP
         if ($input->getOption('ignore')) {
             // check if the user given path works
             if(!$this->filesystem->exists($input->getOption('ignore'))) {
-                $outputter->outputError('Ignore path is incorrect, please use --install or -i or change the path to an absolute path.', $output, $formatter);
+                $this->outputHelper->outputError('Ignore path is incorrect, please use --install or -i or change the path to an absolute path.', $output, $this->formatter);
                 return Command::FAILURE;
             }
             // overwrite the current ignoreFilepath
@@ -67,72 +77,76 @@ class Doctrinator extends Command
         } else {
             // check if the dev set path works
             if(!$this->filesystem->exists($this->ignoreFilepath)){
-                $outputter->outputError('Ignore file not given, please use --install or -i.', $output, $formatter);
+                $this->outputHelper->outputError('Ignore file not given, please use --install or -i.', $output, $this->formatter);
                 return Command::FAILURE;
             }
         }
         if (filesize($this->ignoreFilepath) == 0) {
-            $outputter->outputError('', $output, $formatter);
+            $this->outputHelper->outputError('', $output, $this->formatter);
             return Command::FAILURE;
         }
         if (!$input->getArgument('sourceDirectory')) {
-            $outputter->outputError('Source directory as an argument is missing.', $output, $formatter);
+            $this->outputHelper->outputError('Source directory as an argument is missing.', $output, $this->formatter);
             return Command::FAILURE;
         }
         if (!$input->getArgument('destinationDirectory')) {
-            $outputter->outputError('Destination directory as an argument is missing.', $output, $formatter);
+            $this->outputHelper->outputError('Destination directory as an argument is missing.', $output, $this->formatter);
             return Command::FAILURE;
         }
 
         // need the replace because of path/sub/ can be the same as path/sub but as strings it's seen as different
         if(str_replace("/", "", $input->getArgument('sourceDirectory')) == str_replace("/", "",$input->getArgument('destinationDirectory'))) {
-            $outputter->outputError('Destination directory is the same as the source directory, please choose another folder.', $output, $formatter);
+            $this->outputHelper->outputError('Destination directory is the same as the source directory, please choose another folder.', $output, $this->formatter);
             return Command::FAILURE;
         }
 
         $this->destinationDirectory = $input->getArgument('destinationDirectory');
+        $this->sourceDirectory = $input->getArgument('sourceDirectory');
+        return Command::SUCCESS;
     }
 
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return int
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        /** Setting up */
-        $outputter = new outputHelper();
-        $logger = new logHelper();
-        $doctriner = new doctrineHelper();
-        $this->filesystem = new Filesystem();
-        $formatter = $this->getHelper('formatter');
-        $this->ignoreFilepath = sys_get_temp_dir().'/'.'ignore.yaml';
-        /** ---------  */
+        // needs to be initialized here and not in construct, it relies on the parents construct
+        $this->formatter = $this->getHelper('formatter');
 
-        if ($this->handleArguments($input, $output, $formatter, $outputter) === Command::FAILURE) {
+        if ($this->handleArguments($input, $output) === Command::FAILURE) {
             return Command::FAILURE;
         };
 
-        return $this->crawl($input->getArgument('sourceDirectory'), $output, $outputter, $formatter, $doctriner);
+        if ($this->crawl($output) === Command::FAILURE) {
+            return Command::FAILURE;
+        }
+
+        $this->outputHelper->outputInfo('Finished! A log file with TODOs and info\'s can be found under -> var/log/dev.log or var/log/prod.log.' , $output, $this->formatter);
+        return Command::SUCCESS;
     }
 
     /**
      * creates the needed files to run the cli
      * @param OutputInterface $output
-     * @param outputHelper $outputter
-     * @param FormatterHelper $formatter
      * @return int
      */
-    private function install(OutputInterface $output, outputHelper $outputter, FormatterHelper $formatter)
+    private function install(OutputInterface $output)
     {
-        $outputter->outputInfo('installing...', $output, $formatter);
+        $this->outputHelper->outputInfo('installing...', $output, $this->formatter);
 
         if ($this->filesystem->exists($this->ignoreFilepath)) {
-            $outputter->outputInfo('The ignore.yaml already exists under: '. $this->ignoreFilepath, $output, $formatter);
+            $this->outputHelper->outputInfo('The ignore.yaml already exists under: '. $this->ignoreFilepath, $output, $this->formatter);
             return Command::SUCCESS;
         }
         try {
             $this->filesystem->dumpFile($this->ignoreFilepath, '# The ignore file for instances to be ignored.');
         } catch (IOExceptionInterface $exception) {
-            $outputter->outputError('Failed creating the ignore file at '. $exception->getPath(), $output, $formatter);
+            $this->outputHelper->outputError('Failed creating the ignore file at '. $exception->getPath(), $output, $this->formatter);
             return Command::FAILURE;
         }
-        $outputter->outputInfo('Done! You can find your ignore.yaml under: '. $this->ignoreFilepath, $output, $formatter);
+        $this->outputHelper->outputInfo('Done! You can find your ignore.yaml under: '. $this->ignoreFilepath, $output, $this->formatter);
         return Command::SUCCESS;
     }
 
@@ -145,9 +159,9 @@ class Doctrinator extends Command
      * @param doctrineHelper $doctrineHelper
      * @return int
      */
-    private function crawl(string $path, OutputInterface $output, outputHelper $outputter, FormatterHelper $formatter, doctrineHelper $doctrineHelper)
+    private function crawl(OutputInterface $output)
     {
-        $rii = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path, 0));
+        $rii = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($this->sourceDirectory, 0));
         $parser = (new ParserFactory)->create(ParserFactory::PREFER_PHP7);
         $nodeFinder = new NodeFinder();
 
@@ -179,7 +193,7 @@ class Doctrinator extends Command
             try {
                 $ast = $parser->parse($code);
             } catch (Error $e){
-                $outputter->outputError($e->getMessage() . ' for ' . $file->getFilename(), $output, $formatter);
+                $this->outputHelper->outputError($e->getMessage() . ' for ' . $file->getFilename(), $output, $this->formatter);
                 continue;
             }
 
@@ -187,26 +201,45 @@ class Doctrinator extends Command
             // all classes that extend Insitu_Instance
             $extendingClasses = $nodeFinder->find($ast, function (Node $node) {
                 return $node instanceof Node\Stmt\Class_
-                        && $node->extends !== null
-                        && in_array('Insitu_Instance', $node->extends->parts);
+                        && $node->extends !== null;
             });
-            // TODO split into insitu_instance extenders and others, try to find the files that are extended if not log!
 
-            if (count($extendingClasses) > 1) {
-                // TODO got several instances of Insitu_Instance in one file -> split into two files, log it also fill entity meta!
-                $outputter->outputInfo('got several instances', $output, $formatter);
-            } else if(count($extendingClasses) === 0) {
-                $outputter->outputInfo('no instance', $output, $formatter);
+            if(count($extendingClasses) === 0) {
+                $this->outputHelper->outputInfo('no instance at ' .$file->getFilename(), $output, $this->formatter);
                 continue;
             }
 
             $entitiesMetaObject = [];
 
             foreach($extendingClasses as $extendingClass) {
-
                 if (count($extendingClasses) > 1) {
-                    // TODO log
-                    $outputter->outputInfo('got several instances', $output, $formatter);
+                    $this->logger->info(' Detected several classes inside of one file, the program will create one file for each class inside ' . $file->getFilename());
+                }
+
+                /** LOGGING handles the classes that are extended */
+                foreach ($extendingClass->extends->parts as $part) {
+                    if (strpos($part, 'Collection')) {
+                        $this->logger->info('The ' . $extendingClass->name->name . ' extends the Collection ' . $part . ' inside of ' . $file->getFilename()
+                            . 'Collections are currently not supported...'
+                            . '// TODO establish a relation to the corresponding Instance by hand.');
+                    } // if it's not an Insitu_Instance search for the instance name inside the filenames, if it's not in there log it
+                    else if (!strpos($part, 'Insitu_Instance') && strpos($part, 'Instance')) {
+                        $filesInDir = scandir($this->sourceDirectory);
+                        if (in_array($part . '.php', $filesInDir)) {
+                            $this->logger->info('The ' . $extendingClass->name->name . ' extends the Instance ' . $part . ' inside of ' . $file->getFilename()
+                                . ' // TODO This instance seems to be inside the sourceDirectory and will be created but the relation needs to be established by hand.');
+                        } else {
+                            $this->logger->info('The ' . $extendingClass->name->name . ' extends the ' . $part . ' inside of ' . $file->getFilename() . ' which is not inside the sourceDirectory'
+                                . ' // TODO Either create the missing entity by hand or restart doctrinator with the sourceDirectory containing the missing instance and the extending Instance ' . $extendingClass->name->name . '.');
+                        }
+                    }
+                }
+
+                if(strpos($extendingClass->name->name, 'Collection')) {
+                    $this->logger->info('The ' . $extendingClass->name->name . ' is a Collection' . $part . ' inside of ' . $file->getFilename()
+                        . 'Collections are currently not supported...'
+                        . '// TODO create the collection by hand.');
+                    continue;
                 }
 
                 /** _types */
@@ -214,16 +247,15 @@ class Doctrinator extends Command
                     return $node instanceof Node\Stmt\PropertyProperty && $node->name == '_types';
                 });
 
-                if (count($types) === 0) {
-                    // TODO log if no types given
-                    $outputter->outputInfo('no types', $output, $formatter);
-                    continue;
-                }
-
-                /** Extracts the types keys and values into a php readable object */
                 $typesObj = [];
-                foreach ($types[0]->default->items as $type) {
-                    $typesObj[$type->key->value] = $type->value->value;
+                if (count($types) === 0) {
+                    $this->logger->info('Following Instance found without _types: ' . $extendingClass->name->name . ' inside of ' . $file->getFilename() . '.'
+                    . ' // TODO An entity will still be created, attributes / fields need to be created by hand.');
+                } else {
+                    /** Extracts the types keys and values into a php readable object */
+                    foreach ($types[0]->default->items as $type) {
+                        $typesObj[$type->key->value] = $type->value->value;
+                    }
                 }
 
                 /** entity metadata */
@@ -234,50 +266,35 @@ class Doctrinator extends Command
                 $entitiesMetaObject[$extendingClass->name->name] = [
                     'destinationDirectory' => $this->destinationDirectory,
                     'name' => $extendingClass->name->name,
+                    'table' => null
                 ];
 
                 if (count($table) !== 0) {
-                    $entitiesMetaObject[$extendingClass->name->name] = [
-                        'destinationDirectory' => $this->destinationDirectory,
-                        'name' => $extendingClass->name->name,
-                        'table' => $table[0]->default->value
-                    ];
+                    $entitiesMetaObject[$extendingClass->name->name]['table'] = $table[0]->default->value;
                 }
 
-                /** functions */
+                /** class functions */
                 // TODO probably filter _construct out of it
                 $classMethods = $nodeFinder->find($extendingClass, function (Node $node) {
                     return $node instanceof Node\Stmt\ClassMethod;
                 });
 
                 if (count($classMethods) === 0) {
-                    // TODO log if no class methods given
-                    $outputter->outputInfo('no class methods', $output, $formatter);
-                    continue;
+                    $this->logger->info('The class ' . $extendingClass->name->name . ' has no class methods.'
+                        .' // TODO Please check the original for missing functionalities');
                 }
 
-                //TODO foreach for every entity inside the entityMetaObject
-                $entityString = $doctrineHelper->createEntityFileString($entitiesMetaObject[$extendingClass->name->name], $typesObj, $classMethods);
+                $entityString = $this->doctrineHelper->createEntityFileString($entitiesMetaObject[$extendingClass->name->name], $typesObj, $classMethods);
                 try {
                     $filename = $this->destinationDirectory . '/' . $extendingClass->name->name . '.php';
-                    $outputter->outputInfo('Creating file at ' . $filename, $output, $formatter);
+                    $this->outputHelper->outputInfo('Creating file at ' . $filename, $output, $this->formatter);
                     $this->filesystem->dumpFile($filename , $entityString);
                 } catch (IOExceptionInterface $exception) {
-                    $outputter->outputError('Failed creating the entity file at ' . $exception->getPath(), $output, $formatter);
+                    $this->outputHelper->outputError('Failed creating the entity file at ' . $exception->getPath(), $output, $this->formatter);
                     return Command::FAILURE;
                 }
             }
         }
-
-//             $dumper = new NodeDumper();
-//             echo $dumper->dump($ast) . "\n";
-
-//            echo $prettyPrinter->prettyPrint($types);
-//            $output->writeln('');
-//            echo $prettyPrinter->prettyPrint($classMethods);
-
-            // TODO if function is called but the name is not inside the instance log!
-            // TODO delete break
         return Command::SUCCESS;
     }
 }

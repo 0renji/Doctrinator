@@ -15,12 +15,14 @@ class doctrineHelper
         $entityString = '';
 
         !$entityMetaObject['table']
-            ? $entityString .= $this->createEntityHeader($entityMetaObject['destinationDirectory'], $entityMetaObject['name'], $entityMetaObject['table'])
-            : $entityString .= $this->createEntityHeader($entityMetaObject['destinationDirectory'], $entityMetaObject['name']);
+            ? $entityString .= $this->createEntityHeader($entityMetaObject['destinationDirectory'], $entityMetaObject['name'])
+            : $entityString .= $this->createEntityHeader($entityMetaObject['destinationDirectory'], $entityMetaObject['name'], $entityMetaObject['table']);
 
 
-        foreach ($propertyObject as $propertyKey => $propertyValue) {
-            $entityString .= $this->createProperty($propertyKey, $propertyValue);
+        if (count($propertyObject) > 0) {
+            foreach ($propertyObject as $propertyKey => $propertyValue) {
+                $entityString .= $this->createProperty($propertyKey, $propertyValue);
+            }
         }
 
         $entityString .= "\n";

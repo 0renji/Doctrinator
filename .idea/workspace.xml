@@ -22,12 +22,14 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="bc71b261-7950-43ee-beed-59e9b8a1e829" name="Default Changelist" comment="so far, the console receives also a destination directory;&#10;the crawl now creates an AST of every instance, that is not a insitu base instance;&#10;the ast is also reduced to only the _$types for now;">
+    <list default="true" id="bc71b261-7950-43ee-beed-59e9b8a1e829" name="Default Changelist" comment="console programm now safely creates a file for each class inside a file that extends Insitu_Instance, also goes through each file;&#10;safely checks a given or installed ignore.yaml">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/composer.json" beforeDir="false" afterPath="$PROJECT_DIR$/composer.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/composer.lock" beforeDir="false" afterPath="$PROJECT_DIR$/composer.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/packages/prod/monolog.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/config/packages/prod/monolog.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Command/Doctrinator.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Command/Doctrinator.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Helpers/NodeTraversal/TypesConverter.php" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Helpers/doctrineHelper.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Helpers/doctrineHelper.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Helpers/logHelper.php" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -104,7 +106,7 @@
     </key>
   </component>
   <component name="RunManager">
-    <configuration name="PhpScript" type="PhpLocalRunConfigurationType" factoryName="PHP Console" path="$PROJECT_DIR$/bin/console" scriptParameters="app:doctrinator $USER_HOME$/Desktop/ $USER_HOME$/Desktop/projectTestFolder --ignore=$USER_HOME$/Desktop/ignore.yaml">
+    <configuration name="PhpScript" type="PhpLocalRunConfigurationType" factoryName="PHP Console" path="$PROJECT_DIR$/bin/console" scriptParameters="app:doctrinator $USER_HOME$/Desktop/projectTestSourceFolder $USER_HOME$/Desktop/projectTestFolder --ignore=$USER_HOME$/Desktop/ignore.yaml">
       <CommandLine>
         <PhpTestInterpreterSettings>
           <option name="interpreterName" value="PHP 7.4" />
@@ -124,7 +126,7 @@
       <workItem from="1604932112439" duration="9496000" />
       <workItem from="1604995461657" duration="21116000" />
       <workItem from="1605029443055" duration="955000" />
-      <workItem from="1605082774264" duration="22470000" />
+      <workItem from="1605082774264" duration="36063000" />
     </task>
     <task id="LOCAL-00001" summary="first push;">
       <created>1604932142201</created>
@@ -154,7 +156,14 @@
       <option name="project" value="LOCAL" />
       <updated>1605029073059</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="console programm now safely creates a file for each class inside a file that extends Insitu_Instance, also goes through each file;&#10;safely checks a given or installed ignore.yaml">
+      <created>1605107934366</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1605107934366</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -177,7 +186,8 @@
     <MESSAGE value="adds env; adds error output if directory is not given and install is not used as an option;" />
     <MESSAGE value="adds checks for the ignore file with a working install;" />
     <MESSAGE value="so far, the console receives also a destination directory;&#10;the crawl now creates an AST of every instance, that is not a insitu base instance;&#10;the ast is also reduced to only the _$types for now;" />
-    <option name="LAST_COMMIT_MESSAGE" value="so far, the console receives also a destination directory;&#10;the crawl now creates an AST of every instance, that is not a insitu base instance;&#10;the ast is also reduced to only the _$types for now;" />
+    <MESSAGE value="console programm now safely creates a file for each class inside a file that extends Insitu_Instance, also goes through each file;&#10;safely checks a given or installed ignore.yaml" />
+    <option name="LAST_COMMIT_MESSAGE" value="console programm now safely creates a file for each class inside a file that extends Insitu_Instance, also goes through each file;&#10;safely checks a given or installed ignore.yaml" />
   </component>
   <component name="WindowStateProjectService">
     <state x="2458" y="220" width="824" height="691" key="#CLI_Interpreters" timestamp="1605011960823">
@@ -192,10 +202,10 @@
       <screen x="1920" y="0" width="1920" height="1080" />
     </state>
     <state x="2525" y="183" width="700" height="759" key="#PHP/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605011753837" />
-    <state x="2338" y="198" width="1084" height="746" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1605107839206">
+    <state x="2338" y="198" width="1084" height="746" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1605186568208">
       <screen x="1920" y="0" width="1920" height="1080" />
     </state>
-    <state x="2338" y="198" width="1084" height="746" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605107839206" />
+    <state x="2338" y="198" width="1084" height="746" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605186568208" />
     <state x="2669" y="221" width="412" height="645" key="#com.intellij.ide.util.MemberChooser" timestamp="1605002170792">
       <screen x="1920" y="0" width="1920" height="1080" />
     </state>
@@ -209,46 +219,46 @@
     </state>
     <state x="743" y="311" width="424" height="491" key="FileChooserDialogImpl/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1604932905515" />
     <state x="2663" y="291" width="424" height="491" key="FileChooserDialogImpl/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605101669302" />
-    <state width="1874" height="406" key="GridCell.Tab.0.bottom" timestamp="1605107531660">
+    <state width="1874" height="301" key="GridCell.Tab.0.bottom" timestamp="1605188699913">
       <screen x="1920" y="0" width="1920" height="1080" />
     </state>
-    <state width="1874" height="616" key="GridCell.Tab.0.bottom/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1605097384049" />
-    <state width="1874" height="406" key="GridCell.Tab.0.bottom/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605107531660" />
-    <state width="1874" height="406" key="GridCell.Tab.0.center" timestamp="1605107531660">
+    <state width="1874" height="140" key="GridCell.Tab.0.bottom/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1605176754111" />
+    <state width="1874" height="301" key="GridCell.Tab.0.bottom/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605188699913" />
+    <state width="1874" height="301" key="GridCell.Tab.0.center" timestamp="1605188699913">
       <screen x="1920" y="0" width="1920" height="1080" />
     </state>
-    <state width="1874" height="616" key="GridCell.Tab.0.center/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1605097384049" />
-    <state width="1874" height="406" key="GridCell.Tab.0.center/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605107531660" />
-    <state width="1874" height="406" key="GridCell.Tab.0.left" timestamp="1605107531660">
+    <state width="1874" height="140" key="GridCell.Tab.0.center/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1605176754110" />
+    <state width="1874" height="301" key="GridCell.Tab.0.center/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605188699913" />
+    <state width="1874" height="301" key="GridCell.Tab.0.left" timestamp="1605188699913">
       <screen x="1920" y="0" width="1920" height="1080" />
     </state>
-    <state width="1874" height="616" key="GridCell.Tab.0.left/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1605097384049" />
-    <state width="1874" height="406" key="GridCell.Tab.0.left/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605107531660" />
-    <state width="1874" height="406" key="GridCell.Tab.0.right" timestamp="1605107531660">
+    <state width="1874" height="140" key="GridCell.Tab.0.left/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1605176754110" />
+    <state width="1874" height="301" key="GridCell.Tab.0.left/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605188699913" />
+    <state width="1874" height="301" key="GridCell.Tab.0.right" timestamp="1605188699913">
       <screen x="1920" y="0" width="1920" height="1080" />
     </state>
-    <state width="1874" height="616" key="GridCell.Tab.0.right/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1605097384049" />
-    <state width="1874" height="406" key="GridCell.Tab.0.right/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605107531660" />
-    <state width="1874" height="406" key="GridCell.Tab.1.bottom" timestamp="1605107531604">
+    <state width="1874" height="140" key="GridCell.Tab.0.right/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1605176754110" />
+    <state width="1874" height="301" key="GridCell.Tab.0.right/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605188699913" />
+    <state width="1874" height="301" key="GridCell.Tab.1.bottom" timestamp="1605188702426">
       <screen x="1920" y="0" width="1920" height="1080" />
     </state>
-    <state width="1874" height="616" key="GridCell.Tab.1.bottom/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1605097383991" />
-    <state width="1874" height="406" key="GridCell.Tab.1.bottom/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605107531604" />
-    <state width="1874" height="406" key="GridCell.Tab.1.center" timestamp="1605107531604">
+    <state width="1874" height="140" key="GridCell.Tab.1.bottom/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1605176754111" />
+    <state width="1874" height="301" key="GridCell.Tab.1.bottom/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605188702426" />
+    <state width="1874" height="301" key="GridCell.Tab.1.center" timestamp="1605188702426">
       <screen x="1920" y="0" width="1920" height="1080" />
     </state>
-    <state width="1874" height="616" key="GridCell.Tab.1.center/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1605097383991" />
-    <state width="1874" height="406" key="GridCell.Tab.1.center/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605107531604" />
-    <state width="1874" height="406" key="GridCell.Tab.1.left" timestamp="1605107531604">
+    <state width="1874" height="140" key="GridCell.Tab.1.center/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1605176754111" />
+    <state width="1874" height="301" key="GridCell.Tab.1.center/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605188702426" />
+    <state width="1874" height="301" key="GridCell.Tab.1.left" timestamp="1605188702425">
       <screen x="1920" y="0" width="1920" height="1080" />
     </state>
-    <state width="1874" height="616" key="GridCell.Tab.1.left/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1605097383991" />
-    <state width="1874" height="406" key="GridCell.Tab.1.left/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605107531604" />
-    <state width="1874" height="406" key="GridCell.Tab.1.right" timestamp="1605107531604">
+    <state width="1874" height="140" key="GridCell.Tab.1.left/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1605176754111" />
+    <state width="1874" height="301" key="GridCell.Tab.1.left/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605188702425" />
+    <state width="1874" height="301" key="GridCell.Tab.1.right" timestamp="1605188702426">
       <screen x="1920" y="0" width="1920" height="1080" />
     </state>
-    <state width="1874" height="616" key="GridCell.Tab.1.right/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1605097383991" />
-    <state width="1874" height="406" key="GridCell.Tab.1.right/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605107531604" />
+    <state width="1874" height="140" key="GridCell.Tab.1.right/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1605176754111" />
+    <state width="1874" height="301" key="GridCell.Tab.1.right/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605188702426" />
     <state x="2574" y="252" width="601" height="590" key="NewPhpClassDialog" timestamp="1605012475750">
       <screen x="1920" y="0" width="1920" height="1080" />
     </state>
@@ -263,15 +273,15 @@
       <screen x="0" y="27" width="1920" height="1053" />
     </state>
     <state x="449" y="188" width="1022" height="737" key="SettingsEditor/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1605084981521" />
-    <state x="2475" y="254" width="800" height="563" key="Vcs.Push.Dialog.v2" timestamp="1605029075259">
+    <state x="2475" y="254" width="800" height="563" key="Vcs.Push.Dialog.v2" timestamp="1605107936764">
       <screen x="1920" y="0" width="1920" height="1080" />
     </state>
     <state x="555" y="275" width="800" height="563" key="Vcs.Push.Dialog.v2/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1604941608097" />
-    <state x="2475" y="254" key="Vcs.Push.Dialog.v2/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605029075259" />
-    <state x="2020" y="100" width="1720" height="880" key="com.intellij.history.integration.ui.views.FileHistoryDialog" timestamp="1605028024768">
+    <state x="2475" y="254" width="800" height="563" key="Vcs.Push.Dialog.v2/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605107936764" />
+    <state x="2020" y="100" width="1720" height="880" key="com.intellij.history.integration.ui.views.FileHistoryDialog" timestamp="1605179367805">
       <screen x="1920" y="0" width="1920" height="1080" />
     </state>
-    <state x="2020" y="100" width="1720" height="880" key="com.intellij.history.integration.ui.views.FileHistoryDialog/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605028024768" />
+    <state x="2020" y="100" width="1720" height="880" key="com.intellij.history.integration.ui.views.FileHistoryDialog/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605179367805" />
     <state x="741" y="468" width="428" height="177" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1604938946812">
       <screen x="0" y="27" width="1920" height="1053" />
     </state>
