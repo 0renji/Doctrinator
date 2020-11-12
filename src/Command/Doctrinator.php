@@ -1,7 +1,6 @@
 <?php
 namespace App\Command;
 
-use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 use PhpParser\Node;
 use PhpParser\Error;
@@ -11,6 +10,8 @@ use RecursiveIteratorIterator;
 use SplFileInfo;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\FormatterHelper;
+use Symfony\Component\Console\Helper\QuestionHelper;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -25,14 +26,21 @@ use Symfony\Component\Yaml\Yaml;
 class Doctrinator extends Command
 {
     protected static $defaultName = 'app:doctrinator';
+    // Needed files
     private $ignoreFilepath;
+    private $doctrineTypesMapperFilepath;
+    // Helper
     private $logger;
     private $formatter;
+    private $questioner;
+    private $filesystem;
+    // Self-Made Helper
     private $outputHelper;
     private $doctrineHelper;
+    // Directories
     private $sourceDirectory;
     private $destinationDirectory;
-    private $filesystem;
+
 
     public function __construct(LoggerInterface $logger)
     {
@@ -41,7 +49,7 @@ class Doctrinator extends Command
         $this->doctrineHelper = new doctrineHelper();
         $this->filesystem = new Filesystem();
         $this->ignoreFilepath = sys_get_temp_dir().'/'.'ignore.yaml';
-
+        $this->doctrineTypesMapperFilepath = sys_get_temp_dir().'/'.'doctrineTypesMapper.yaml';
         parent::__construct();
     }
 
@@ -50,6 +58,7 @@ class Doctrinator extends Command
             ->setDescription('Creates Doctrine Instances of your Codeigniter Instances.')
             ->addOption('install', 'i',InputOption::VALUE_NONE, 'Tells the cli to install it\'s needed workspace')
             ->addOption('ignore','ig', InputOption::VALUE_REQUIRED, 'The directory path containing the ignore file.')
+            ->addOption('types', 't', InputOption::VALUE_REQUIRED, 'The directory path containing the doctrineTypesMapper file.')
             ->addArgument('sourceDirectory', InputArgument::OPTIONAL, 'The directory path containing codeigniter instances.')
             ->addArgument('destinationDirectory', InputArgument::OPTIONAL, 'The directory path that will contain doctrine entities.');
     }
@@ -60,12 +69,8 @@ class Doctrinator extends Command
      * @return int
      */
     protected function handleArguments(InputInterface $input, OutputInterface $output) {
-        // check of install is required
-        // fill ignoreFile with the working ignore file pointer with readonly
-        if ($input->getOption('install')) {
-            return $this->install($output);
-        }
-        // check if the ignore path is given, and if the path works, then fill the FP
+        /** FILEPATH OPTIONS */
+        // check if the ignore path is given, and if the path works, if not fill with default
         if ($input->getOption('ignore')) {
             // check if the user given path works
             if(!$this->filesystem->exists($input->getOption('ignore'))) {
@@ -77,14 +82,45 @@ class Doctrinator extends Command
         } else {
             // check if the dev set path works
             if(!$this->filesystem->exists($this->ignoreFilepath)){
-                $this->outputHelper->outputError('Ignore file not given, please use --install or -i.', $output, $this->formatter);
+                $this->outputHelper->outputError('Default file path for the ignore.yaml not working, please use --install or -i or manually create the file and link it with --types=path/to/file.yaml in your call.', $output, $this->formatter);
                 return Command::FAILURE;
             }
         }
+
         if (filesize($this->ignoreFilepath) == 0) {
-            $this->outputHelper->outputError('', $output, $this->formatter);
+            $this->outputHelper->outputInfo('Your ignore file is empty.', $output, $this->formatter);
+            $question = new ConfirmationQuestion('Go on without ignoring any files in your source directory?', false);
+
+            if (!$this->questioner->ask($input, $output, $question)) {
+                return Command::SUCCESS;
+            }
+
             return Command::FAILURE;
         }
+
+        if ($input->getOption('types')) {
+            // check if the user given path works
+            if(!$this->filesystem->exists($input->getOption('types'))) {
+                $this->outputHelper->outputError('Dcotrine Types Mapper path is incorrect, please use --install or -i or change the path to an absolute path.', $output, $this->formatter);
+                return Command::FAILURE;
+            }
+            // overwrite the current path
+            $this->doctrineTypesMapperFilepath = $input->getOption('types');
+        } else {
+            // check if the dev set path works
+            if(!$this->filesystem->exists($this->doctrineTypesMapperFilepath)){
+                $this->outputHelper->outputError('Default file path for the doctrineTypesMapper.yaml not working, please use --install or -i or manually create the file and link it with --types=path/to/file.yaml in your call.', $output, $this->formatter);
+                return Command::FAILURE;
+            }
+        }
+
+        if (filesize($this->doctrineTypesMapperFilepath) == 0) {
+            $this->outputHelper->outputError('Your doctrineTypesMapper file is empty, please define type mappings, see the installed doctrineTypesMapper.yaml comments for instructions after installing.', $output, $this->formatter);
+
+            return Command::FAILURE;
+        }
+
+        /** DIRECTORY ARGUMENTS */
         if (!$input->getArgument('sourceDirectory')) {
             $this->outputHelper->outputError('Source directory as an argument is missing.', $output, $this->formatter);
             return Command::FAILURE;
@@ -114,6 +150,12 @@ class Doctrinator extends Command
     {
         // needs to be initialized here and not in construct, it relies on the parents construct
         $this->formatter = $this->getHelper('formatter');
+        $this->questioner = $this->getHelper('question');
+
+        // check of install is required
+        if ($input->getOption('install')) {
+            return $this->install($output);
+        }
 
         if ($this->handleArguments($input, $output) === Command::FAILURE) {
             return Command::FAILURE;
@@ -128,25 +170,116 @@ class Doctrinator extends Command
     }
 
     /**
+     * @param OutputInterface $output
+     * @return int
+     */
+    private function createIgnoreFile(OutputInterface $output) {
+        if ($this->filesystem->exists($this->ignoreFilepath)) {
+            $this->outputHelper->outputInfo('The ignore.yaml already exists under: '. $this->ignoreFilepath, $output, $this->formatter);
+            return Command::SUCCESS;
+        }
+
+        $this->outputHelper->outputInfo('creating a ignore.yaml at ' . $this->ignoreFilepath, $output, $this->formatter);
+
+        try {
+            $this->filesystem->dumpFile($this->ignoreFilepath,
+                '# The ignore file for instances to be ignored.' . "\n"
+                . '# Example entry for an instance would be:' . "\n"
+                . '# Instances:' . "\n"
+                . '#' . "\t" . '- "Example_Instance.php"' . "\n");
+        } catch (IOExceptionInterface $exception) {
+            $this->outputHelper->outputError('Failed creating the ignore file at '. $exception->getPath(), $output, $this->formatter);
+            return Command::FAILURE;
+        }
+
+        return Command::SUCCESS;
+    }
+
+    /**
+     * @param OutputInterface $output
+     * @return int
+     */
+    private function createDoctrineTypesMapperFile (OutputInterface $output) {
+
+        if ($this->filesystem->exists($this->doctrineTypesMapperFilepath)){
+            $this->outputHelper->outputInfo('The doctrineTypesMapper.yaml already exists under: '. $this->doctrineTypesMapperFilepath, $output, $this->formatter);
+            return Command::SUCCESS;
+        }
+
+        $this->outputHelper->outputInfo('creating a doctrineTypesMapper.yaml at ' . $this->doctrineTypesMapperFilepath, $output, $this->formatter);
+
+        try {
+            $this->filesystem->appendToFile($this->doctrineTypesMapperFilepath,
+                '# The doctrine types mapper file for the creation of your entities.' . "\n"
+                . '# The structure should be like this:');
+            $array = [
+                'ForAll' => [
+                    'id' => [
+                        'id' => [
+                            'type' => 'integer',
+                            'generator' => [
+                                'strategy' => 'AUTO'
+                            ]
+                        ],
+                        'id_or_dbdefault' => [
+                            'type' => 'integer',
+                            'generator' => [
+                                'strategy' => 'AUTO'
+                            ]
+                        ],
+
+                    ],
+                    'fields' => [
+                        'spacetime' => [
+                            'type' => 'datetime'
+                        ],
+                        'spacetime_or_dbdefault' => [
+                            'type' => 'datetime'
+                        ],
+                        'bool' => [
+                            'type' => 'boolean'
+                        ],
+                        'bool_or_null' => [
+                            'type' => 'boolean'
+                        ],
+                    ]
+                ],
+                'Exceptions' => [],
+            ];
+
+            $yaml = Yaml::dump($array, 5);
+
+            $this->filesystem->appendToFile($this->doctrineTypesMapperFilepath,  "\n\n". $yaml);
+
+            $this->filesystem->appendToFile($this->doctrineTypesMapperFilepath,
+                "\n" .'# Example for Exception entities:' . "\n" .
+                '# EntityName => [ ' . "\n" .
+                '#' . "\t" . '\'type\' => \'entity\',' . "\n" .
+                '#' . "\t" . ' \'id\' => [],' . "\n" .
+                '#' . "\t" . ' \'fields\' => [],' . "\n".
+                '# ]' . "\n");
+
+        } catch (IOExceptionInterface $exception) {
+            $this->outputHelper->outputError('Failed creating the doctrineTypes file at '. $exception->getPath(), $output, $this->formatter);
+            return Command::FAILURE;
+        }
+
+        return Command::SUCCESS;
+    }
+
+    /**
      * creates the needed files to run the cli
      * @param OutputInterface $output
      * @return int
      */
     private function install(OutputInterface $output)
     {
-        $this->outputHelper->outputInfo('installing...', $output, $this->formatter);
+        $this->outputHelper->outputInfo('Installing...', $output, $this->formatter);
 
-        if ($this->filesystem->exists($this->ignoreFilepath)) {
-            $this->outputHelper->outputInfo('The ignore.yaml already exists under: '. $this->ignoreFilepath, $output, $this->formatter);
-            return Command::SUCCESS;
-        }
-        try {
-            $this->filesystem->dumpFile($this->ignoreFilepath, '# The ignore file for instances to be ignored.');
-        } catch (IOExceptionInterface $exception) {
-            $this->outputHelper->outputError('Failed creating the ignore file at '. $exception->getPath(), $output, $this->formatter);
-            return Command::FAILURE;
-        }
-        $this->outputHelper->outputInfo('Done! You can find your ignore.yaml under: '. $this->ignoreFilepath, $output, $this->formatter);
+        $this->createIgnoreFile($output);
+        $this->createDoctrineTypesMapperFile($output);
+
+        $this->outputHelper->outputInfo('Done! You can find the installed files under: '. $this->ignoreFilepath . ' ' . $this->doctrineTypesMapperFilepath, $output, $this->formatter);
         return Command::SUCCESS;
     }
 
@@ -284,13 +417,14 @@ class Doctrinator extends Command
                         .' // TODO Please check the original for missing functionalities');
                 }
 
-                $entityString = $this->doctrineHelper->createEntityFileString($entitiesMetaObject[$extendingClass->name->name], $typesObj, $classMethods);
+                $entityString = $this->doctrineHelper->createEntityFileString($entitiesMetaObject[$extendingClass->name->name], $typesObj, $classMethods, $this->doctrineTypesMapperFilepath);
+
                 try {
                     $filename = $this->destinationDirectory . '/' . $extendingClass->name->name . '.php';
                     $this->outputHelper->outputInfo('Creating file at ' . $filename, $output, $this->formatter);
                     $this->filesystem->dumpFile($filename , $entityString);
                 } catch (IOExceptionInterface $exception) {
-                    $this->outputHelper->outputError('Failed creating the entity file at ' . $exception->getPath(), $output, $this->formatter);
+                    $this->outputHelper->outputError('Failed creating the entity file at ' . $exception->getPath(), $output, $this->formatter, $this->doctrineTypesMapperFilepath);
                     return Command::FAILURE;
                 }
             }

@@ -9,10 +9,12 @@ class doctrineHelper
      * @param array $entityMetaObject
      * @param array $propertyObject
      * @param array $methodsAST
+     * @param string $doctrineTypesMapperFilepath
      * @return string
      */
-    public function createEntityFileString (array $entityMetaObject, array $propertyObject, array $methodsAST) {
+    public function createEntityFileString (array $entityMetaObject, array $propertyObject, array $methodsAST, string $doctrineTypesMapperFilepath) {
         $entityString = '';
+        // TODO use mapped types!
 
         !$entityMetaObject['table']
             ? $entityString .= $this->createEntityHeader($entityMetaObject['destinationDirectory'], $entityMetaObject['name'])
