@@ -71,6 +71,240 @@ class Doctrinator extends Command
      * @param OutputInterface $output
      * @return int
      */
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        // needs to be initialized here and not in construct, it relies on the parents construct
+        $this->formatter = $this->getHelper('formatter');
+        $this->questioner = $this->getHelper('question');
+
+        // check of install is required
+        if ($input->getOption('install')) {
+            return $this->install($output);
+        }
+
+        if ($this->handleArguments($input, $output) === Command::FAILURE) {
+            return Command::FAILURE;
+        };
+
+        if ($this->crawl($output) === Command::FAILURE) {
+            return Command::FAILURE;
+        }
+
+        $this->outputHelper->outputInfo(
+            'Finished! A log file with TODOs and info\'s can be found under -> '
+            . $this->devLogPath . ' or ' . $this->prodLogPath . '.' , $output, $this->formatter);
+        return Command::SUCCESS;
+    }
+
+    /**
+     * crawls through the given path and reads every instance
+     * @param OutputInterface $output
+     * @return int
+     */
+    private function crawl(OutputInterface $output)
+    {
+        $rii = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($this->sourceDirectory, 0));
+        $parser = (new ParserFactory)->create(ParserFactory::PREFER_PHP7);
+        $nodeFinder = new NodeFinder();
+
+        // parse ignore.yaml
+        $ignoreYaml = Yaml::parse(file_get_contents($this->ignoreFilepath));
+        $filesToIgnore = $ignoreYaml['Instances'];
+
+        $generalLogs = [];
+        $collectionLogs = [];
+        $instanceLogs = [];
+
+        /** @var SplFileInfo  $file */
+        foreach ($rii as $file) {
+
+            /** FILE CHECKS */
+            if ($file->isDir()) {
+                continue;
+            }
+            // if the current file is not php skip
+            if ($file->getExtension() != 'php') {
+                continue;
+            }
+            // check if the filename is a base insitu instance skip
+            if (str_contains(strtolower($file->getFilename()), 'insitu_')
+                || $filesToIgnore && in_array($file->getFilename(), $filesToIgnore)) {
+                continue;
+            }
+            /** ------------ */
+
+            $code = file_get_contents($file->getPathname());
+
+            try {
+                $ast = $parser->parse($code);
+            } catch (Error $e){
+                $this->outputHelper->outputError($e->getMessage() . ' for ' . $file->getFilename(), $output, $this->formatter);
+                continue;
+            }
+
+            /**   Filter the ast with the nodeFinder */
+            // all classes that extend Insitu_Instance
+            $extendingClasses = $nodeFinder->find($ast, function (Node $node) {
+                return $node instanceof Node\Stmt\Class_
+                    && $node->extends !== null;
+            });
+
+            if(count($extendingClasses) === 0) {
+                $this->outputHelper->outputInfo('no instance at ' .$file->getFilename(), $output, $this->formatter);
+                continue;
+            }
+
+            $entitiesMetaObject = [];
+
+            foreach($extendingClasses as $extendingClass) {
+                if (count($extendingClasses) > 1) {
+                    $generalLogs[$file->getFilename()][] = 'Detected several classes inside of one file, the program will create one file for each class inside ' . $file->getFilename();
+                }
+
+                /** LOGGING handles the classes that are extended */
+                // looks at the class behind the "extends" expression -> $part
+                foreach ($extendingClass->extends->parts as $part) {
+                    $logMessage = '';
+
+                    if (strpos($part, 'Collection')) {
+                        $logMessage =
+                            'The ' . $extendingClass->name->name . ' extends the Collection ' . $part . ' inside of ' . $file->getFilename()
+                            . 'Collections are currently not supported...'
+                            . '// TODO establish a relation to the corresponding Instance by hand.';
+                    } // if it's not an Insitu_Instance search for the instance name inside the filenames, if it's not in there log it
+                    else if (!strpos($part, 'Insitu_Instance') && strpos($part, 'Instance')) {
+                        $filesInDir = scandir($this->sourceDirectory);
+                        if (in_array($part . '.php', $filesInDir)) {
+                            $logMessage =
+                                'The ' . $extendingClass->name->name . ' extends the Instance ' . $part . ' inside of ' . $file->getFilename()
+                                . ' // TODO This instance seems to be inside the sourceDirectory and will be created but the relation needs to be established by hand.';
+                        }
+                    } else {
+                        $logMessage =
+                            'The ' . $extendingClass->name->name . ' extends the ' . $part . ' inside of ' . $file->getFilename() . ' which is not inside the sourceDirectory'
+                            . ' // TODO Either create the missing entity by hand or restart doctrinator with the sourceDirectory containing the missing instance and the extending Instance ' . $extendingClass->name->name . '.';
+                    }
+                    if ($logMessage !== '') {
+                        if (strpos($extendingClass->name->name, 'Collection')) {
+                            $collectionLogs[$extendingClass->name->name][] = $logMessage;
+                        } else {
+                            $instanceLogs[$extendingClass->name->name][] = $logMessage;
+                        }
+                    }
+                }
+
+                if(strpos($extendingClass->name->name, 'Collection')) {
+                    $collectionLogs[$extendingClass->name->name][] =
+                        'The ' . $extendingClass->name->name . ' is a Collection' . $part . ' inside of ' . $file->getFilename()
+                        . ' Collections are currently not supported...'
+                        . '// TODO create the collection by hand.';
+                    continue;
+                }
+
+                /** _types */
+                $types = $nodeFinder->find($extendingClass, function (Node $node) {
+                    return $node instanceof Node\Stmt\PropertyProperty && $node->name == '_types';
+                });
+
+                $typesObj = [];
+                if (count($types) === 0) {
+                    $instanceLogs[$extendingClass->name->name][] =
+                        'Following Instance found without _types: ' . $extendingClass->name->name . ' inside of ' . $file->getFilename() . '.'
+                        . ' // TODO An entity will still be created, attributes / fields need to be created by hand.';
+                } else {
+                    /** Extracts the types keys and values into a php readable object */
+                    foreach ($types[0]->default->items as $type) {
+                        $typesObj[$type->key->value] = $type->value->value;
+                    }
+                }
+
+                /** entity metadata */
+                $table = $nodeFinder->find($extendingClass, function (Node $node) {
+                    return $node instanceof Node\Stmt\PropertyProperty && $node->name == '_table';
+                });
+
+                $entitiesMetaObject[$extendingClass->name->name] = [
+                    'destinationDirectory' => $this->destinationDirectory,
+                    'name' => $extendingClass->name->name,
+                    'table' => null
+                ];
+
+                if (count($table) !== 0) {
+                    $entitiesMetaObject[$extendingClass->name->name]['table'] = $table[0]->default->value;
+                }
+
+                /** class functions */
+                // TODO probably filter _construct out of it
+                $classMethods = $nodeFinder->find($extendingClass, function (Node $node) {
+                    return $node instanceof Node\Stmt\ClassMethod;
+                });
+
+                if (count($classMethods) === 0) {
+                    $instanceLogs[$extendingClass->name->name][] =
+                        'The class ' . $extendingClass->name->name . ' has no class methods.'
+                        .' // TODO Please check the original for missing functionalities';
+                }
+
+                // filter could happen above but I want to log if there is a construct inside and modify it
+                // deleting the body so it doesn't interfere when validating doctrine entities
+                array_map(function ($node) use($extendingClass, $parser, $output) {
+                    if ($node->name->name === '__construct') {
+                        $instanceLogs[$extendingClass->name->name][] =
+                            'Constructor function found inside of ' . $extendingClass->name->name
+                            . 'will add the header for the function and it\'s insides will be removed for doctrine validation reasons.';
+
+                        $node->stmts = [];
+                    }
+                    return $node;
+                }, $classMethods);
+
+                $entityObject = $this->doctrineHelper->createEntityFileString($entitiesMetaObject[$extendingClass->name->name], $typesObj, $classMethods, $this->doctrineTypesMapperFilepath);
+
+                $entityString = $entityObject['entityString'];
+
+                // add log messages from templating
+                if ($entityObject['logMessages'] && count($entityObject['logMessages']) > 0) {
+                    foreach ($entityObject['logMessages'] as $logMessage) {
+                        $instanceLogs[$extendingClass->name->name][] = $logMessage;
+                    }
+                }
+
+                try {
+                    $filename = $this->destinationDirectory . '/' . $extendingClass->name->name . '.php';
+                    $this->outputHelper->outputInfo('Creating file at ' . $filename, $output, $this->formatter);
+                    $this->filesystem->dumpFile($filename , $entityString);
+                } catch (IOExceptionInterface $exception) {
+                    $this->outputHelper->outputError('Failed creating the entity file at ' . $exception->getPath(), $output, $this->formatter);
+                    return Command::FAILURE;
+                }
+            }
+        }
+
+        $this->logAll($generalLogs, $collectionLogs, $instanceLogs);
+        return Command::SUCCESS;
+    }
+
+    /**
+     * creates the needed files to run the cli
+     * @param OutputInterface $output
+     * @return int
+     */
+    private function install(OutputInterface $output)
+    {
+        $this->outputHelper->outputInfo('Installing...', $output, $this->formatter);
+
+        $this->createIgnoreFile($output);
+        $this->createDoctrineTypesMapperFile($output);
+
+        $this->outputHelper->outputInfo('Done! You can find the installed files under: '. $this->ignoreFilepath . ' ' . $this->doctrineTypesMapperFilepath, $output, $this->formatter);
+        return Command::SUCCESS;
+    }
+
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return int
+     */
     protected function handleArguments(InputInterface $input, OutputInterface $output) {
         /** LOGGER OPTIONS */
         if ($input->getOption('clearlog')) {
@@ -159,36 +393,6 @@ class Doctrinator extends Command
 
         $this->destinationDirectory = $input->getArgument('destinationDirectory');
         $this->sourceDirectory = $input->getArgument('sourceDirectory');
-        return Command::SUCCESS;
-    }
-
-    /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @return int
-     */
-    protected function execute(InputInterface $input, OutputInterface $output)
-    {
-        // needs to be initialized here and not in construct, it relies on the parents construct
-        $this->formatter = $this->getHelper('formatter');
-        $this->questioner = $this->getHelper('question');
-
-        // check of install is required
-        if ($input->getOption('install')) {
-            return $this->install($output);
-        }
-
-        if ($this->handleArguments($input, $output) === Command::FAILURE) {
-            return Command::FAILURE;
-        };
-
-        if ($this->crawl($output) === Command::FAILURE) {
-            return Command::FAILURE;
-        }
-
-        $this->outputHelper->outputInfo(
-            'Finished! A log file with TODOs and info\'s can be found under -> '
-            . $this->devLogPath . ' or ' . $this->prodLogPath . '.' , $output, $this->formatter);
         return Command::SUCCESS;
     }
 
@@ -282,210 +486,6 @@ class Doctrinator extends Command
             return Command::FAILURE;
         }
 
-        return Command::SUCCESS;
-    }
-
-    /**
-     * creates the needed files to run the cli
-     * @param OutputInterface $output
-     * @return int
-     */
-    private function install(OutputInterface $output)
-    {
-        $this->outputHelper->outputInfo('Installing...', $output, $this->formatter);
-
-        $this->createIgnoreFile($output);
-        $this->createDoctrineTypesMapperFile($output);
-
-        $this->outputHelper->outputInfo('Done! You can find the installed files under: '. $this->ignoreFilepath . ' ' . $this->doctrineTypesMapperFilepath, $output, $this->formatter);
-        return Command::SUCCESS;
-    }
-
-    /**
-     * crawls through the given path and reads every instance
-     * @param OutputInterface $output
-     * @return int
-     */
-    private function crawl(OutputInterface $output)
-    {
-        $rii = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($this->sourceDirectory, 0));
-        $parser = (new ParserFactory)->create(ParserFactory::PREFER_PHP7);
-        $nodeFinder = new NodeFinder();
-
-        // parse ignore.yaml
-        $ignoreYaml = Yaml::parse(file_get_contents($this->ignoreFilepath));
-        $filesToIgnore = $ignoreYaml['Instances'];
-
-        $generalLogs = [];
-        $collectionLogs = [];
-        $instanceLogs = [];
-
-        /** @var SplFileInfo  $file */
-        foreach ($rii as $file) {
-
-            /** FILE CHECKS */
-            if ($file->isDir()) {
-                continue;
-            }
-            // if the current file is not php skip
-            if ($file->getExtension() != 'php') {
-                continue;
-            }
-            // check if the filename is a base insitu instance skip
-            if (str_contains(strtolower($file->getFilename()), 'insitu_')
-                || $filesToIgnore && in_array($file->getFilename(), $filesToIgnore)) {
-                continue;
-            }
-            /** ------------ */
-
-            $code = file_get_contents($file->getPathname());
-
-            try {
-                $ast = $parser->parse($code);
-            } catch (Error $e){
-                $this->outputHelper->outputError($e->getMessage() . ' for ' . $file->getFilename(), $output, $this->formatter);
-                continue;
-            }
-
-            /**   Filter the ast with the nodeFinder */
-            // all classes that extend Insitu_Instance
-            $extendingClasses = $nodeFinder->find($ast, function (Node $node) {
-                return $node instanceof Node\Stmt\Class_
-                        && $node->extends !== null;
-            });
-
-            if(count($extendingClasses) === 0) {
-                $this->outputHelper->outputInfo('no instance at ' .$file->getFilename(), $output, $this->formatter);
-                continue;
-            }
-
-            $entitiesMetaObject = [];
-
-            foreach($extendingClasses as $extendingClass) {
-                if (count($extendingClasses) > 1) {
-                    $generalLogs[$file->getFilename()][] = 'Detected several classes inside of one file, the program will create one file for each class inside ' . $file->getFilename();
-                }
-
-                /** LOGGING handles the classes that are extended */
-                // looks at the class behind the "extends" expression -> $part
-                foreach ($extendingClass->extends->parts as $part) {
-                    $logMessage = '';
-
-                    if (strpos($part, 'Collection')) {
-                        $logMessage =
-                            'The ' . $extendingClass->name->name . ' extends the Collection ' . $part . ' inside of ' . $file->getFilename()
-                            . 'Collections are currently not supported...'
-                            . '// TODO establish a relation to the corresponding Instance by hand.';
-                    } // if it's not an Insitu_Instance search for the instance name inside the filenames, if it's not in there log it
-                    else if (!strpos($part, 'Insitu_Instance') && strpos($part, 'Instance')) {
-                        $filesInDir = scandir($this->sourceDirectory);
-                        if (in_array($part . '.php', $filesInDir)) {
-                            $logMessage =
-                                'The ' . $extendingClass->name->name . ' extends the Instance ' . $part . ' inside of ' . $file->getFilename()
-                                . ' // TODO This instance seems to be inside the sourceDirectory and will be created but the relation needs to be established by hand.';
-                        }
-                    } else {
-                        $logMessage =
-                            'The ' . $extendingClass->name->name . ' extends the ' . $part . ' inside of ' . $file->getFilename() . ' which is not inside the sourceDirectory'
-                            . ' // TODO Either create the missing entity by hand or restart doctrinator with the sourceDirectory containing the missing instance and the extending Instance ' . $extendingClass->name->name . '.';
-                    }
-                    if ($logMessage !== '') {
-                        if (strpos($extendingClass->name->name, 'Collection')) {
-                            $collectionLogs[$extendingClass->name->name][] = $logMessage;
-                        } else {
-                            $instanceLogs[$extendingClass->name->name][] = $logMessage;
-                        }
-                    }
-                }
-
-                if(strpos($extendingClass->name->name, 'Collection')) {
-                    $collectionLogs[$extendingClass->name->name][] =
-                        'The ' . $extendingClass->name->name . ' is a Collection' . $part . ' inside of ' . $file->getFilename()
-                        . ' Collections are currently not supported...'
-                        . '// TODO create the collection by hand.';
-                    continue;
-                }
-
-                /** _types */
-                $types = $nodeFinder->find($extendingClass, function (Node $node) {
-                    return $node instanceof Node\Stmt\PropertyProperty && $node->name == '_types';
-                });
-
-                $typesObj = [];
-                if (count($types) === 0) {
-                   $instanceLogs[$extendingClass->name->name][] =
-                       'Following Instance found without _types: ' . $extendingClass->name->name . ' inside of ' . $file->getFilename() . '.'
-                    . ' // TODO An entity will still be created, attributes / fields need to be created by hand.';
-                } else {
-                    /** Extracts the types keys and values into a php readable object */
-                    foreach ($types[0]->default->items as $type) {
-                        $typesObj[$type->key->value] = $type->value->value;
-                    }
-                }
-
-                /** entity metadata */
-                $table = $nodeFinder->find($extendingClass, function (Node $node) {
-                    return $node instanceof Node\Stmt\PropertyProperty && $node->name == '_table';
-                });
-
-                $entitiesMetaObject[$extendingClass->name->name] = [
-                    'destinationDirectory' => $this->destinationDirectory,
-                    'name' => $extendingClass->name->name,
-                    'table' => null
-                ];
-
-                if (count($table) !== 0) {
-                    $entitiesMetaObject[$extendingClass->name->name]['table'] = $table[0]->default->value;
-                }
-
-                /** class functions */
-                // TODO probably filter _construct out of it
-                $classMethods = $nodeFinder->find($extendingClass, function (Node $node) {
-                    return $node instanceof Node\Stmt\ClassMethod;
-                });
-
-                if (count($classMethods) === 0) {
-                    $instanceLogs[$extendingClass->name->name][] =
-                        'The class ' . $extendingClass->name->name . ' has no class methods.'
-                        .' // TODO Please check the original for missing functionalities';
-                }
-
-                // filter could happen above but I want to log if there is a construct inside and modify it
-                // deleting the body so it doesn't interfere when validating doctrine entities
-                array_map(function ($node) use($extendingClass, $parser, $output) {
-                    if ($node->name->name === '__construct') {
-                        $instanceLogs[$extendingClass->name->name][] =
-                            'Constructor function found inside of ' . $extendingClass->name->name
-                            . 'will add the header for the function and it\'s insides will be removed for doctrine validation reasons.';
-
-                        $node->stmts = [];
-                    }
-                    return $node;
-                }, $classMethods);
-
-                $entityObject = $this->doctrineHelper->createEntityFileString($entitiesMetaObject[$extendingClass->name->name], $typesObj, $classMethods, $this->doctrineTypesMapperFilepath, $this->logger);
-
-                $entityString = $entityObject['entityString'];
-
-                // add log messages from templating
-                if ($entityObject['logMessages'] && count($entityObject['logMessages']) > 0) {
-                    foreach ($entityObject['logMessages'] as $logMessage) {
-                        $instanceLogs[$extendingClass->name->name][] = $logMessage;
-                    }
-                }
-
-                try {
-                    $filename = $this->destinationDirectory . '/' . $extendingClass->name->name . '.php';
-                    $this->outputHelper->outputInfo('Creating file at ' . $filename, $output, $this->formatter);
-                    $this->filesystem->dumpFile($filename , $entityString);
-                } catch (IOExceptionInterface $exception) {
-                    $this->outputHelper->outputError('Failed creating the entity file at ' . $exception->getPath(), $output, $this->formatter);
-                    return Command::FAILURE;
-                }
-            }
-        }
-
-        $this->logAll($generalLogs, $collectionLogs, $instanceLogs);
         return Command::SUCCESS;
     }
 
