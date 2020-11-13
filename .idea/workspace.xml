@@ -22,8 +22,21 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="bc71b261-7950-43ee-beed-59e9b8a1e829" name="Default Changelist" comment="reorders the functions and fixes createEntity call;">
-      <change beforePath="$PROJECT_DIR$/src/Command/Doctrinator.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Command/Doctrinator.php" afterDir="false" />
+    <list default="true" id="bc71b261-7950-43ee-beed-59e9b8a1e829" name="Default Changelist" comment="adds a log if mapping is not inside the types yaml;">
+      <change afterPath="$PROJECT_DIR$/config/packages/prod/doctrine.yaml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/routes/annotations.yaml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Entity/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Entity/AddressInstance.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Repository/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.env" beforeDir="false" afterPath="$PROJECT_DIR$/.env" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/Doctrinator.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Doctrinator.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/php.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/php.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/composer.json" beforeDir="false" afterPath="$PROJECT_DIR$/composer.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/composer.lock" beforeDir="false" afterPath="$PROJECT_DIR$/composer.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/bundles.php" beforeDir="false" afterPath="$PROJECT_DIR$/config/bundles.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/services.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/config/services.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/symfony.lock" beforeDir="false" afterPath="$PROJECT_DIR$/symfony.lock" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -35,6 +48,11 @@
     <execution />
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="main" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="PhpWorkspaceProjectConfiguration" interpreter_name="PHP 7.4">
@@ -77,16 +95,35 @@
       <path value="$PROJECT_DIR$/vendor/symfony/polyfill-php73" />
       <path value="$PROJECT_DIR$/vendor/symfony/property-info" />
       <path value="$PROJECT_DIR$/vendor/nikic/php-parser" />
+      <path value="$PROJECT_DIR$/vendor/symfony/doctrine-bridge" />
+      <path value="$PROJECT_DIR$/vendor/doctrine/common" />
+      <path value="$PROJECT_DIR$/vendor/doctrine/persistence" />
+      <path value="$PROJECT_DIR$/vendor/doctrine/doctrine-bundle" />
+      <path value="$PROJECT_DIR$/vendor/doctrine/lexer" />
+      <path value="$PROJECT_DIR$/vendor/doctrine/event-manager" />
+      <path value="$PROJECT_DIR$/vendor/doctrine/instantiator" />
+      <path value="$PROJECT_DIR$/vendor/doctrine/collections" />
+      <path value="$PROJECT_DIR$/vendor/doctrine/cache" />
+      <path value="$PROJECT_DIR$/vendor/doctrine/dbal" />
+      <path value="$PROJECT_DIR$/vendor/doctrine/orm" />
+      <path value="$PROJECT_DIR$/vendor/doctrine/sql-formatter" />
+      <path value="$PROJECT_DIR$/vendor/doctrine/inflector" />
+      <path value="$PROJECT_DIR$/vendor/doctrine/annotations" />
     </include_path>
   </component>
   <component name="ProjectId" id="1k3bEd6C3J17lpLvouzWly3zs3g" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="com.jetbrains.php.lang.actions.generation.PhpGenerateFieldAccessorHandlerBase$MyMemberChooser.fluent.setters.last.selected" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/../insitwo" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
@@ -99,8 +136,8 @@
       <recent name="$PROJECT_DIR$/src" />
     </key>
   </component>
-  <component name="RunManager">
-    <configuration name="PhpScript" type="PhpLocalRunConfigurationType" factoryName="PHP Console" path="$PROJECT_DIR$/bin/console" scriptParameters="app:doctrinator $USER_HOME$/Desktop/projectTestSourceFolder $USER_HOME$/Desktop/projectTestFolder --ignore=$USER_HOME$/Desktop/ignore.yaml">
+  <component name="RunManager" selected="PHP Script.Debug">
+    <configuration name="Debug" type="PhpLocalRunConfigurationType" factoryName="PHP Console" path="$PROJECT_DIR$/bin/console" scriptParameters="app:doctrinator $USER_HOME$/Desktop/projectTestSourceFolder $USER_HOME$/Desktop/projectTestFolder --ignore=$USER_HOME$/Desktop/ignore.yaml">
       <CommandLine>
         <PhpTestInterpreterSettings>
           <option name="interpreterName" value="PHP 7.4" />
@@ -108,6 +145,18 @@
       </CommandLine>
       <method v="2" />
     </configuration>
+    <configuration name="EntityTest" type="PhpLocalRunConfigurationType" factoryName="PHP Console" path="$PROJECT_DIR$/bin/console" scriptParameters="app:test">
+      <CommandLine>
+        <PhpTestInterpreterSettings>
+          <option name="interpreterName" value="PHP 7.4" />
+        </PhpTestInterpreterSettings>
+      </CommandLine>
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="PHP Script.Debug" />
+      <item itemvalue="PHP Script.EntityTest" />
+    </list>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -120,7 +169,7 @@
       <workItem from="1604932112439" duration="9496000" />
       <workItem from="1604995461657" duration="21116000" />
       <workItem from="1605029443055" duration="955000" />
-      <workItem from="1605082774264" duration="72984000" />
+      <workItem from="1605082774264" duration="83836000" />
     </task>
     <task id="LOCAL-00001" summary="first push;">
       <created>1604932142201</created>
@@ -206,7 +255,42 @@
       <option name="project" value="LOCAL" />
       <updated>1605271390146</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="now logs for each file, withing for each instance of the file and so on;&#10;also removes collections, models and exceptions from creation;">
+      <created>1605286773164</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1605286773164</updated>
+    </task>
+    <task id="LOCAL-00014" summary="removes methods and puts a comment with every method name;">
+      <created>1605287987759</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1605287987759</updated>
+    </task>
+    <task id="LOCAL-00015" summary="adds nullable check and template injection;">
+      <created>1605291816002</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1605291816002</updated>
+    </task>
+    <task id="LOCAL-00016" summary="removes unneccesary func;">
+      <created>1605291846540</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1605291846540</updated>
+    </task>
+    <task id="LOCAL-00017" summary="adds a log if mapping is not inside the types yaml;">
+      <created>1605292783520</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1605292783520</updated>
+    </task>
+    <option name="localTasksCounter" value="18" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -225,6 +309,7 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
+    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <MESSAGE value="first push;" />
     <MESSAGE value="adds env; adds error output if directory is not given and install is not used as an option;" />
     <MESSAGE value="adds checks for the ignore file with a working install;" />
@@ -237,7 +322,13 @@
     <MESSAGE value="questions now work;" />
     <MESSAGE value="has sexier logging through intern log collections with a dedicated log outputter;&#10;adds a clear log option;" />
     <MESSAGE value="reorders the functions and fixes createEntity call;" />
-    <option name="LAST_COMMIT_MESSAGE" value="reorders the functions and fixes createEntity call;" />
+    <MESSAGE value="now logs for each file, withing for each instance of the file and so on;&#10;also removes collections, models and exceptions from creation;" />
+    <MESSAGE value="removes methods and puts a comment with every method name;" />
+    <MESSAGE value="adds nullable check" />
+    <MESSAGE value="adds nullable check and template injection;" />
+    <MESSAGE value="removes unneccesary func;" />
+    <MESSAGE value="adds a log if mapping is not inside the types yaml;" />
+    <option name="LAST_COMMIT_MESSAGE" value="adds a log if mapping is not inside the types yaml;" />
   </component>
   <component name="WindowStateProjectService">
     <state x="2458" y="220" width="824" height="691" key="#CLI_Interpreters" timestamp="1605011960823">
@@ -252,105 +343,133 @@
       <screen x="1920" y="0" width="1920" height="1080" />
     </state>
     <state x="2525" y="183" width="700" height="759" key="#PHP/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605011753837" />
-    <state x="418" y="220" width="1084" height="746" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1605279231785">
-      <screen x="0" y="27" width="1920" height="1053" />
+    <state x="1971" y="86" width="1084" height="746" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1605296277394">
+      <screen x="1920" y="0" width="1920" height="1080" />
     </state>
     <state x="418" y="220" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1605279231785" />
-    <state x="2338" y="198" width="1084" height="746" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605266565486" />
-    <state x="2669" y="221" width="412" height="645" key="#com.intellij.ide.util.MemberChooser" timestamp="1605002170792">
+    <state x="1971" y="86" width="1084" height="746" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605296277394" />
+    <state x="2669" y="221" width="441" height="645" key="#com.intellij.ide.util.MemberChooser" timestamp="1605295798930">
       <screen x="1920" y="0" width="1920" height="1080" />
     </state>
-    <state x="2669" y="221" width="412" height="645" key="#com.intellij.ide.util.MemberChooser/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605002170792" />
-    <state x="2613" y="298" width="524" height="491" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog" timestamp="1605260425709">
+    <state x="2669" y="221" width="441" height="645" key="#com.intellij.ide.util.MemberChooser/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605295798930" />
+    <state x="2613" y="298" width="524" height="491" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog" timestamp="1605296159818">
       <screen x="1920" y="0" width="1920" height="1080" />
     </state>
-    <state x="2613" y="298" width="524" height="491" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605260425709" />
-    <state x="3061" y="488" key="#xdebugger.evaluate" timestamp="1605265025182">
+    <state x="2613" y="298" width="524" height="491" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605296159818" />
+    <state x="3061" y="488" key="#xdebugger.evaluate" timestamp="1605290758119">
       <screen x="1920" y="0" width="1920" height="1080" />
     </state>
-    <state x="3061" y="488" key="#xdebugger.evaluate/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605265025182" />
+    <state x="3061" y="488" key="#xdebugger.evaluate/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605290758119" />
+    <state x="2613" y="454" width="523" height="178" key="ComposerInitDialogKey" timestamp="1605298020789">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state x="2613" y="454" width="523" height="178" key="ComposerInitDialogKey/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605298020789" />
+    <state width="466" height="506" key="DebuggerActiveHint" timestamp="1605292287490">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state width="466" height="506" key="DebuggerActiveHint/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605292287490" />
     <state x="2663" y="291" width="424" height="491" key="FileChooserDialogImpl" timestamp="1605189120268">
       <screen x="1920" y="0" width="1920" height="1080" />
     </state>
     <state x="743" y="311" width="424" height="491" key="FileChooserDialogImpl/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1604932905515" />
     <state x="2663" y="291" width="424" height="491" key="FileChooserDialogImpl/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605189120268" />
-    <state width="1874" height="95" key="GridCell.Tab.0.bottom" timestamp="1605283859528">
+    <state width="937" height="279" key="GridCell.Tab.0.bottom" timestamp="1605298312647">
       <screen x="1920" y="0" width="1920" height="1080" />
     </state>
     <state width="1874" height="140" key="GridCell.Tab.0.bottom/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1605176754111" />
-    <state width="1874" height="95" key="GridCell.Tab.0.bottom/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605283859528" />
-    <state width="1874" height="95" key="GridCell.Tab.0.center" timestamp="1605283859527">
+    <state width="937" height="279" key="GridCell.Tab.0.bottom/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605298312647" />
+    <state width="937" height="279" key="GridCell.Tab.0.center" timestamp="1605298312647">
       <screen x="1920" y="0" width="1920" height="1080" />
     </state>
     <state width="1874" height="140" key="GridCell.Tab.0.center/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1605176754110" />
-    <state width="1874" height="95" key="GridCell.Tab.0.center/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605283859527" />
-    <state width="1874" height="95" key="GridCell.Tab.0.left" timestamp="1605283859527">
+    <state width="937" height="279" key="GridCell.Tab.0.center/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605298312647" />
+    <state width="937" height="279" key="GridCell.Tab.0.left" timestamp="1605298312647">
       <screen x="1920" y="0" width="1920" height="1080" />
     </state>
     <state width="1874" height="140" key="GridCell.Tab.0.left/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1605176754110" />
-    <state width="1874" height="95" key="GridCell.Tab.0.left/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605283859527" />
-    <state width="1874" height="95" key="GridCell.Tab.0.right" timestamp="1605283859527">
+    <state width="937" height="279" key="GridCell.Tab.0.left/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605298312647" />
+    <state width="937" height="279" key="GridCell.Tab.0.right" timestamp="1605298312647">
       <screen x="1920" y="0" width="1920" height="1080" />
     </state>
     <state width="1874" height="140" key="GridCell.Tab.0.right/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1605176754110" />
-    <state width="1874" height="95" key="GridCell.Tab.0.right/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605283859527" />
-    <state width="1874" height="95" key="GridCell.Tab.1.bottom" timestamp="1605283859841">
+    <state width="937" height="279" key="GridCell.Tab.0.right/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605298312647" />
+    <state width="1324" height="89" key="GridCell.Tab.1.bottom" timestamp="1605297727100">
       <screen x="1920" y="0" width="1920" height="1080" />
     </state>
     <state width="1874" height="140" key="GridCell.Tab.1.bottom/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1605176754111" />
-    <state width="1874" height="95" key="GridCell.Tab.1.bottom/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605283859841" />
-    <state width="1874" height="95" key="GridCell.Tab.1.center" timestamp="1605283859841">
+    <state width="1324" height="89" key="GridCell.Tab.1.bottom/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605297727100" />
+    <state width="1324" height="89" key="GridCell.Tab.1.center" timestamp="1605297727099">
       <screen x="1920" y="0" width="1920" height="1080" />
     </state>
     <state width="1874" height="140" key="GridCell.Tab.1.center/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1605176754111" />
-    <state width="1874" height="95" key="GridCell.Tab.1.center/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605283859841" />
-    <state width="1874" height="95" key="GridCell.Tab.1.left" timestamp="1605283859841">
+    <state width="1324" height="89" key="GridCell.Tab.1.center/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605297727099" />
+    <state width="1324" height="89" key="GridCell.Tab.1.left" timestamp="1605297727099">
       <screen x="1920" y="0" width="1920" height="1080" />
     </state>
     <state width="1874" height="140" key="GridCell.Tab.1.left/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1605176754111" />
-    <state width="1874" height="95" key="GridCell.Tab.1.left/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605283859841" />
-    <state width="1874" height="95" key="GridCell.Tab.1.right" timestamp="1605283859841">
+    <state width="1324" height="89" key="GridCell.Tab.1.left/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605297727099" />
+    <state width="1324" height="89" key="GridCell.Tab.1.right" timestamp="1605297727100">
       <screen x="1920" y="0" width="1920" height="1080" />
     </state>
     <state width="1874" height="140" key="GridCell.Tab.1.right/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1605176754111" />
-    <state width="1874" height="95" key="GridCell.Tab.1.right/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605283859841" />
+    <state width="1324" height="89" key="GridCell.Tab.1.right/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605297727100" />
     <state x="2574" y="252" width="601" height="590" key="NewPhpClassDialog" timestamp="1605012475750">
       <screen x="1920" y="0" width="1920" height="1080" />
     </state>
     <state x="654" y="273" width="601" height="568" key="NewPhpClassDialog/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1604932365842" />
     <state x="2574" y="252" width="601" height="590" key="NewPhpClassDialog/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605012475750" />
-    <state x="2675" y="464" width="399" height="156" key="NewPhpFileDialog" timestamp="1605019882807">
+    <state x="2675" y="464" width="399" height="156" key="NewPhpFileDialog" timestamp="1605294233215">
       <screen x="1920" y="0" width="1920" height="1080" />
     </state>
     <state x="755" y="479" width="399" height="156" key="NewPhpFileDialog/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1604932385068" />
-    <state x="2675" y="464" width="399" height="156" key="NewPhpFileDialog/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605019882807" />
+    <state x="2675" y="464" width="399" height="156" key="NewPhpFileDialog/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605294233215" />
     <state x="449" y="188" width="1022" height="737" key="SettingsEditor" timestamp="1605084981521">
       <screen x="0" y="27" width="1920" height="1053" />
     </state>
     <state x="449" y="188" width="1022" height="737" key="SettingsEditor/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1605084981521" />
-    <state x="2475" y="254" width="800" height="563" key="Vcs.Push.Dialog.v2" timestamp="1605271391736">
+    <state x="2475" y="254" width="800" height="563" key="Vcs.Push.Dialog.v2" timestamp="1605292785368">
       <screen x="1920" y="0" width="1920" height="1080" />
     </state>
     <state x="555" y="275" width="800" height="563" key="Vcs.Push.Dialog.v2/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1605267082358" />
-    <state x="2475" y="254" width="800" height="563" key="Vcs.Push.Dialog.v2/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605271391736" />
-    <state x="2020" y="100" width="1720" height="880" key="com.intellij.history.integration.ui.views.FileHistoryDialog" timestamp="1605179367805">
+    <state x="2475" y="254" width="800" height="563" key="Vcs.Push.Dialog.v2/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605292785368" />
+    <state x="2020" y="100" width="1720" height="880" key="com.intellij.history.integration.ui.views.FileHistoryDialog" timestamp="1605296148526">
       <screen x="1920" y="0" width="1920" height="1080" />
     </state>
-    <state x="2020" y="100" width="1720" height="880" key="com.intellij.history.integration.ui.views.FileHistoryDialog/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605179367805" />
+    <state x="2020" y="100" width="1720" height="880" key="com.intellij.history.integration.ui.views.FileHistoryDialog/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605296148526" />
+    <state x="2486" y="153" width="778" height="780" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser" timestamp="1605294852380">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state x="2486" y="153" width="778" height="780" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605294852380" />
     <state x="2661" y="452" width="438" height="182" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1605258564530">
       <screen x="1920" y="0" width="1920" height="1080" />
     </state>
     <state x="741" y="468" width="428" height="177" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1604938946812" />
     <state x="2661" y="452" width="438" height="182" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605258564530" />
-    <state x="2571" y="272" width="618" height="536" key="find.popup" timestamp="1605286479175">
+    <state x="2571" y="272" width="618" height="536" key="find.popup" timestamp="1605297656068">
       <screen x="1920" y="0" width="1920" height="1080" />
     </state>
     <state x="651" y="292" width="618" height="522" key="find.popup/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1605095528582" />
-    <state x="2571" y="272" width="618" height="536" key="find.popup/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605286479175" />
+    <state x="2571" y="272" width="618" height="536" key="find.popup/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605297656068" />
     <state x="2543" y="238" width="672" height="696" key="search.everywhere.popup" timestamp="1605270027775">
       <screen x="1920" y="0" width="1920" height="1080" />
     </state>
     <state x="623" y="259" width="672" height="678" key="search.everywhere.popup/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1604936526502" />
     <state x="2543" y="238" width="672" height="696" key="search.everywhere.popup/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1605270027775" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="php">
+          <url>file://$PROJECT_DIR$/src/Command/Doctrinator.php</url>
+          <line>265</line>
+          <option name="timeStamp" value="29" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="php">
+          <url>file://$PROJECT_DIR$/src/Helpers/doctrineHelper.php</url>
+          <line>43</line>
+          <option name="timeStamp" value="30" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>
