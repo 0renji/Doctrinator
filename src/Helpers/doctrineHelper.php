@@ -13,11 +13,10 @@ class doctrineHelper
      * @param array $propertyObject
      * @param array $methodsAST
      * @param string $doctrineTypesMapperFilepath
-     * @param LoggerInterface $logger
-     * @return string
+     * @return array
      */
-    public function createEntityFileString (array $entityMetaObject, array $propertyObject, array $methodsAST, string $doctrineTypesMapperFilepath, LoggerInterface $logger) {
-
+    public function createEntityFileString (array $entityMetaObject, array $propertyObject, array $methodsAST, string $doctrineTypesMapperFilepath) {
+        $logMessages = [];
         $entityString = '';
 
         $typesYaml = Yaml::parse(file_get_contents($doctrineTypesMapperFilepath));
@@ -47,7 +46,7 @@ class doctrineHelper
                 $logMessage = 'Property ' . $propertyKey . '\'s type is not listed inside the types mapper yaml, injecting it\'s given type and adding TODO.';
 
                 if(count($typesToMap) == 0) {
-                    $logger->info($logMessage);
+                   $logMessages[] = $logMessage;
                     $entityString .= $todoString;
                 } else if (array_key_exists($propertyValue, $typesToMap)){
                     if($typesToMap[$propertyValue] && $typesToMap[$propertyValue]['type']) {
@@ -57,7 +56,7 @@ class doctrineHelper
 
                         $propertyValue = $typesToMap[$propertyValue]['type'];
                     } else {
-                        $logger->info($logMessage);
+                        $logMessages[] = $logMessage;
                         $entityString .= $todoString;
                     }
                 }
@@ -75,7 +74,7 @@ class doctrineHelper
             $entityString .= "\t" . $methodString . "\n";
         }
 
-        return $entityString . '}' ."\n";
+        return ['entityString' => $entityString . '}' ."\n", 'logMessages' => $logMessages];
     }
 
     /**
