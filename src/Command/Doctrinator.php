@@ -258,30 +258,6 @@ class Doctrinator extends Command
                     return $node instanceof Node\Stmt\ClassMethod;
                 });
 
-                if (count($classMethods) === 0) {
-                    $instanceLogs[$extendingClass->name->name]['messages'][] =
-                        'The class ' . $extendingClass->name->name . ' has no class methods.';
-                    $instanceLogs[$extendingClass->name->name]['todos'][] =
-                        '// TODO Please check the original for missing functionalities';
-                }
-
-                /** Logging */
-                // filter could happen above but I want to log if there is a construct inside
-                // deleting the function so it doesn't interfere when validating doctrine entities
-                foreach($classMethods as $method) {
-                    if ($method->name->name === '__construct') {
-                        $instanceLogs[$extendingClass->name->name]['messages'][] =
-                            'Constructor function found inside of ' . $extendingClass->name->name .' will be removed for doctrine validation reasons.';
-
-                       // $node->stmts = [];
-                    }
-                }
-
-                // filtering contruct out of the methods
-                $classMethods = $nodeFinder->find($extendingClass, function (Node $node) {
-                    return $node instanceof Node\Stmt\ClassMethod && $node->name->name !== '__construct';
-                });
-
                 $entityObject = $this->doctrineHelper->createEntityFileString($entitiesMetaObject[$extendingClass->name->name], $typesObj, $classMethods, $this->doctrineTypesMapperFilepath);
 
                 $entityString = $entityObject['entityString'];

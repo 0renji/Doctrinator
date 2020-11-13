@@ -1,9 +1,6 @@
 <?php
 namespace App\Helpers;
 
-use PhpParser\PrettyPrinter;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Yaml\Yaml;
 
 class doctrineHelper
@@ -11,11 +8,10 @@ class doctrineHelper
     /**
      * @param array $entityMetaObject
      * @param array $propertyObject
-     * @param array $methodsAST
      * @param string $doctrineTypesMapperFilepath
      * @return array
      */
-    public function createEntityFileString (array $entityMetaObject, array $propertyObject, array $methodsAST, string $doctrineTypesMapperFilepath) {
+    public function createEntityFileString (array $entityMetaObject, array $propertyObject, array $classMethods, string $doctrineTypesMapperFilepath) {
         $logMessages = [];
         $entityString = '';
 
@@ -66,13 +62,13 @@ class doctrineHelper
             }
         }
 
-        $entityString .= "\n";
-
-        $prettyPrinter = new PrettyPrinter\Standard;
-        $methodStrings = explode("\n", $prettyPrinter->prettyPrint($methodsAST));
-        foreach ($methodStrings as $methodString) {
-            $entityString .= "\t" . $methodString . "\n";
+        if($classMethods && count($classMethods)) {
+            foreach ($classMethods as $method) {
+                $entityString .= "\n" . '// Method '. $method->name->name . ' has been removed, if it\'s needed please implement it by hand.' . "\n";
+            }
         }
+
+        $entityString .= "\n";
 
         return ['entityString' => $entityString . '}' ."\n", 'logMessages' => $logMessages];
     }
@@ -108,7 +104,6 @@ class doctrineHelper
             . 'class ' . $entityName . ' { ' ."\n";
 
         return $entityHeader;
-
     }
 
     /**
