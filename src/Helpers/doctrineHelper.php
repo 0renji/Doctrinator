@@ -46,7 +46,8 @@ class doctrineHelper
                 if(count($typesToMap) == 0) {
                    $logMessages[] = $logMessage;
                     $entityString .= $todoString;
-                } else if (array_key_exists($propertyValue, $typesToMap)){
+                }
+                else if (array_key_exists($propertyValue, $typesToMap)){
                     if($typesToMap[$propertyValue] && $typesToMap[$propertyValue]['type']) {
                         if(array_key_exists('generator', $typesToMap[$propertyValue])) {
                             $generated = true;
@@ -56,10 +57,11 @@ class doctrineHelper
                         }
 
                         $propertyValue = $typesToMap[$propertyValue]['type'];
-                    } else {
-                        $logMessages[] = $logMessage;
-                        $entityString .= $todoString;
                     }
+                }
+                else {
+                    $logMessages[] = $logMessage;
+                    $entityString .= $todoString;
                 }
 
                 if(strpos($propertyValue, '_or_null')) {
