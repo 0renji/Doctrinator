@@ -172,8 +172,4 @@ class doctrineHelper
 
         return $annotation . "\n";
     }
-
-    private function appendTodoComment(string $entityString, string $todo) {
-
-    }
 }
