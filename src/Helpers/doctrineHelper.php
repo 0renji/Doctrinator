@@ -38,6 +38,8 @@ class doctrineHelper
         if (count($propertyObject) > 0) {
             foreach ($propertyObject as $propertyKey => $propertyValue) {
                 $generated = false;
+                $nullable = false;
+
                 $todoString = "\t". '// TODO change the given type to a doctrine usable type'. "\n";
                 $logMessage = 'Property ' . $propertyKey . '\'s type is not listed inside the types mapper yaml, injecting it\'s given type and adding TODO.';
 
@@ -49,6 +51,9 @@ class doctrineHelper
                         if(array_key_exists('generator', $typesToMap[$propertyValue])) {
                             $generated = true;
                         }
+                        if(array_key_exists('nullable', $typesToMap[$propertyValue])) {
+                            $nullable = true;
+                        }
 
                         $propertyValue = $typesToMap[$propertyValue]['type'];
                     } else {
@@ -57,8 +62,12 @@ class doctrineHelper
                     }
                 }
 
+                if(strpos($propertyValue, '_or_null')) {
+                    $nullable = true;
+                }
+
                 // There are many generator strategies, could be implemented in future but for now AUTO is default
-                $entityString .= $this->createProperty($propertyKey, $propertyValue, $generated );
+                $entityString .= $this->createProperty($propertyKey, $propertyValue, $generated, $nullable);
             }
         }
 
@@ -112,9 +121,9 @@ class doctrineHelper
      * @param bool $generated
      * @return string
      */
-    private function createProperty (string $propertyName, string $propertyType, bool $generated) {
+    private function createProperty (string $propertyName, string $propertyType, bool $generated, bool $nullable) {
         $propertyString = '';
-        $annotation = $this->createPropertyAnnotation($propertyName, $propertyType, $generated);
+        $annotation = $this->createPropertyAnnotation($propertyName, $propertyType, $generated, $nullable);
         $propertyString .= $annotation
             . "\t" . 'protected $' . $propertyName . ';' . "\n";
 
@@ -127,8 +136,16 @@ class doctrineHelper
      * @param bool $generated
      * @return string
      */
-    private function createPropertyAnnotation (string $propertyName, string $propertyType, bool $generated) {
-       $annotation = "\t" . '/**' . "\n";
+    private function createPropertyAnnotation (string $propertyName, string $propertyType, bool $generated, bool $nullable) {
+        $annotation = '';
+
+        // check of the instance has a foreign key, indicated by name e.g. user_id or type id_or_null
+        if(strpos($propertyName, '_id') && !strpos($propertyType, '_or_null')) {
+            $nullable = false;
+            $annotation .= "\t" . '// TODO create a n to n relation by hand for this property' . "\n";
+        }
+
+        $annotation .= "\t" . '/**' . "\n";
 
         switch ($propertyName) {
             case 'id':
@@ -141,16 +158,22 @@ class doctrineHelper
 
         switch ($propertyType) {
             case 'id':
-                $annotation .= "\t" . ' * @ORM\Column(type="integer")' . "\n";
+                $annotation .= "\t" . ' * @ORM\Column(type="integer",';
             break;
             default:
-                $annotation .= "\t" . ' * @ORM\Column(type="' . $propertyType . '")' . "\n";
+                $annotation .= "\t" . ' * @ORM\Column(type="' . $propertyType .'",';
         }
+
+        $annotation .= 'nullable='. var_export($nullable, true) . ')' . "\n";
 
         $annotation .=
             "\t" .   ' * @var ' . $propertyName . "\n"
             . "\t" . ' */';
 
         return $annotation . "\n";
+    }
+
+    private function appendTodoComment(string $entityString, string $todo) {
+
     }
 }
