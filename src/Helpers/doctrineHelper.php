@@ -2,6 +2,9 @@
 namespace App\Helpers;
 
 use PhpParser\PrettyPrinter;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Yaml\Yaml;
 
 class doctrineHelper
 {
@@ -10,20 +13,57 @@ class doctrineHelper
      * @param array $propertyObject
      * @param array $methodsAST
      * @param string $doctrineTypesMapperFilepath
+     * @param LoggerInterface $logger
      * @return string
      */
-    public function createEntityFileString (array $entityMetaObject, array $propertyObject, array $methodsAST, string $doctrineTypesMapperFilepath) {
+    public function createEntityFileString (array $entityMetaObject, array $propertyObject, array $methodsAST, string $doctrineTypesMapperFilepath, LoggerInterface $logger) {
+
         $entityString = '';
-        // TODO use mapped types!
+
+        $typesYaml = Yaml::parse(file_get_contents($doctrineTypesMapperFilepath));
 
         !$entityMetaObject['table']
             ? $entityString .= $this->createEntityHeader($entityMetaObject['destinationDirectory'], $entityMetaObject['name'])
             : $entityString .= $this->createEntityHeader($entityMetaObject['destinationDirectory'], $entityMetaObject['name'], $entityMetaObject['table']);
 
+        // check if the class name is inside the exceptions if not check if All is given -> use the All
+        // if all is empty use given property value and comment on it inside foreach
+        $typesToMap = [];
+
+        if ($typesYaml && count($typesYaml) > 0) {
+            if ($typesYaml['All']) {
+                $typesToMap = $typesYaml['All'];
+            }
+
+            if ($typesYaml['Exceptions'] && in_array($entityMetaObject['name'], $typesYaml['Exceptions'])) {
+                $typesToMap = $typesYaml['Exceptions'][$entityMetaObject['name']];
+            }
+        }
 
         if (count($propertyObject) > 0) {
             foreach ($propertyObject as $propertyKey => $propertyValue) {
-                $entityString .= $this->createProperty($propertyKey, $propertyValue);
+                $generated = false;
+                $todoString = "\t". '// TODO change the given type to a doctrine usable type'. "\n";
+                $logMessage = 'Property ' . $propertyKey . '\'s type is not listed inside the types mapper yaml, injecting it\'s given type and adding TODO.';
+
+                if(count($typesToMap) == 0) {
+                    $logger->info($logMessage);
+                    $entityString .= $todoString;
+                } else if (array_key_exists($propertyValue, $typesToMap)){
+                    if($typesToMap[$propertyValue] && $typesToMap[$propertyValue]['type']) {
+                        if(array_key_exists('generator', $typesToMap[$propertyValue])) {
+                            $generated = true;
+                        }
+
+                        $propertyValue = $typesToMap[$propertyValue]['type'];
+                    } else {
+                        $logger->info($logMessage);
+                        $entityString .= $todoString;
+                    }
+                }
+
+                // There are many generator strategies, could be implemented in future but for now AUTO is default
+                $entityString .= $this->createProperty($propertyKey, $propertyValue, $generated );
             }
         }
 
@@ -75,11 +115,12 @@ class doctrineHelper
     /**
      * @param string $propertyName
      * @param string $propertyType
+     * @param bool $generated
      * @return string
      */
-    private function createProperty (string $propertyName, string $propertyType) {
+    private function createProperty (string $propertyName, string $propertyType, bool $generated) {
         $propertyString = '';
-        $annotation = $this->createPropertyAnnotation($propertyName, $propertyType);
+        $annotation = $this->createPropertyAnnotation($propertyName, $propertyType, $generated);
         $propertyString .= $annotation
             . "\t" . 'protected $' . $propertyName . ';' . "\n";
 
@@ -89,18 +130,19 @@ class doctrineHelper
     /**
      * @param string $propertyName
      * @param string $propertyType
+     * @param bool $generated
      * @return string
      */
-    private function createPropertyAnnotation (string $propertyName, string $propertyType) {
-       // TODO maybe rely on a doctrineMapper.yaml
+    private function createPropertyAnnotation (string $propertyName, string $propertyType, bool $generated) {
        $annotation = "\t" . '/**' . "\n";
 
         switch ($propertyName) {
             case 'id':
                 $annotation .=
-                    "\t" .   ' * @ORM\Id' . "\n"
-                    . "\t" . ' * @ORM\GeneratedValue' . "\n";
-
+                    "\t" .   ' * @ORM\Id' . "\n";
+                if ($generated) {
+                    $annotation .= "\t" . ' * @ORM\GeneratedValue' . "\n";
+                }
         }
 
         switch ($propertyType) {

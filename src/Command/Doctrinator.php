@@ -1,10 +1,6 @@
 <?php
 namespace App\Command;
 
-use PhpParser\BuilderFactory;
-use PhpParser\NodeDumper;
-use PhpParser\NodeTraverser;
-use PhpParser\PrettyPrinter;
 use Psr\Log\LoggerInterface;
 use PhpParser\Node;
 use PhpParser\Error;
@@ -14,7 +10,6 @@ use RecursiveIteratorIterator;
 use SplFileInfo;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\FormatterHelper;
-use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -93,9 +88,10 @@ class Doctrinator extends Command
 
         if (filesize($this->ignoreFilepath) == 0) {
             $this->outputHelper->outputInfo('Your ignore file is empty.', $output, $this->formatter);
-            $question = new ConfirmationQuestion('Go on without ignoring any files in your source directory?', false);
+            $question = new ConfirmationQuestion(
+                'Go on without ignoring any files in your source directory?', false);
 
-            if (!$this->questioner->ask($input, $output, $question)) {
+            if ($this->questioner->ask($input, $output, $question)) {
                 return Command::SUCCESS;
             }
 
@@ -120,8 +116,11 @@ class Doctrinator extends Command
 
         if (filesize($this->doctrineTypesMapperFilepath) == 0) {
             $this->outputHelper->outputError('Your doctrineTypesMapper file is empty, please define type mappings, see the installed doctrineTypesMapper.yaml comments for instructions after installing.', $output, $this->formatter);
+            $question = new ConfirmationQuestion('Go on without having types mapped?',false);
 
-            return Command::FAILURE;
+            if (!$this->questioner->ask($input, $output, $question)) {
+                return Command::FAILURE;
+            }
         }
 
         /** DIRECTORY ARGUMENTS */
@@ -217,36 +216,31 @@ class Doctrinator extends Command
                 '# The doctrine types mapper file for the creation of your entities.' . "\n"
                 . '# The structure should be like this:');
             $array = [
-                'ForAll' => [
+                'All' => [
                     'id' => [
-                        'id' => [
-                            'type' => 'integer',
-                            'generator' => [
-                                'strategy' => 'AUTO'
-                            ]
-                        ],
-                        'id_or_dbdefault' => [
-                            'type' => 'integer',
-                            'generator' => [
-                                'strategy' => 'AUTO'
-                            ]
-                        ],
-
+                        'type' => 'integer',
+                        'generator' => [
+                            'strategy' => 'AUTO'
+                        ]
                     ],
-                    'fields' => [
-                        'spacetime' => [
-                            'type' => 'datetime'
-                        ],
-                        'spacetime_or_dbdefault' => [
-                            'type' => 'datetime'
-                        ],
-                        'bool' => [
-                            'type' => 'boolean'
-                        ],
-                        'bool_or_null' => [
-                            'type' => 'boolean'
-                        ],
-                    ]
+                    'id_or_dbdefault' => [
+                        'type' => 'integer',
+                        'generator' => [
+                            'strategy' => 'AUTO'
+                        ]
+                    ],
+                    'spacetime' => [
+                        'type' => 'datetime'
+                    ],
+                    'spacetime_or_dbdefault' => [
+                        'type' => 'datetime'
+                    ],
+                    'bool' => [
+                        'type' => 'boolean'
+                    ],
+                    'bool_or_null' => [
+                        'type' => 'boolean'
+                    ],
                 ],
                 'Exceptions' => [],
             ];
@@ -289,11 +283,7 @@ class Doctrinator extends Command
 
     /**
      * crawls through the given path and reads every instance
-     * @param string $path
      * @param OutputInterface $output
-     * @param outputHelper $outputter
-     * @param FormatterHelper $formatter
-     * @param doctrineHelper $doctrineHelper
      * @return int
      */
     private function crawl(OutputInterface $output)
@@ -304,7 +294,6 @@ class Doctrinator extends Command
 
         // parse ignore.yaml
         $ignoreYaml = Yaml::parse(file_get_contents($this->ignoreFilepath));
-        // $output->writeln(Yaml::dump($ignoreYaml['Instances'][0]));
         $filesToIgnore = $ignoreYaml['Instances'];
 
         /** @var SplFileInfo  $file */
@@ -427,14 +416,14 @@ class Doctrinator extends Command
                     if ($node->name->name === '__construct') {
                         $this->logger->info(
                             'Constructor function found inside of ' . $extendingClass->name->name
-                            . 'will add the header for the function and it\'s insides will be commented out for doctrine reasons.');
+                            . 'will add the header for the function and it\'s insides will be removed for doctrine validation reasons.');
 
                         $node->stmts = [];
                     }
                     return $node;
                 }, $classMethods);
 
-                $entityString = $this->doctrineHelper->createEntityFileString($entitiesMetaObject[$extendingClass->name->name], $typesObj, $classMethods, $this->doctrineTypesMapperFilepath);
+                $entityString = $this->doctrineHelper->createEntityFileString($entitiesMetaObject[$extendingClass->name->name], $typesObj, $classMethods, $this->doctrineTypesMapperFilepath, $this->logger);
 
                 try {
                     $filename = $this->destinationDirectory . '/' . $extendingClass->name->name . '.php';
