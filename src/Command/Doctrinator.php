@@ -1,6 +1,10 @@
 <?php
 namespace App\Command;
 
+use PhpParser\BuilderFactory;
+use PhpParser\NodeDumper;
+use PhpParser\NodeTraverser;
+use PhpParser\PrettyPrinter;
 use Psr\Log\LoggerInterface;
 use PhpParser\Node;
 use PhpParser\Error;
@@ -417,6 +421,19 @@ class Doctrinator extends Command
                         .' // TODO Please check the original for missing functionalities');
                 }
 
+                // filter could happen above but I want to log if there is a construct inside and modify it
+                // deleting the body so it doesn't interfere when validating doctrine entities
+                array_map(function ($node) use($extendingClass, $parser, $output) {
+                    if ($node->name->name === '__construct') {
+                        $this->logger->info(
+                            'Constructor function found inside of ' . $extendingClass->name->name
+                            . 'will add the header for the function and it\'s insides will be commented out for doctrine reasons.');
+
+                        $node->stmts = [];
+                    }
+                    return $node;
+                }, $classMethods);
+
                 $entityString = $this->doctrineHelper->createEntityFileString($entitiesMetaObject[$extendingClass->name->name], $typesObj, $classMethods, $this->doctrineTypesMapperFilepath);
 
                 try {
@@ -424,7 +441,7 @@ class Doctrinator extends Command
                     $this->outputHelper->outputInfo('Creating file at ' . $filename, $output, $this->formatter);
                     $this->filesystem->dumpFile($filename , $entityString);
                 } catch (IOExceptionInterface $exception) {
-                    $this->outputHelper->outputError('Failed creating the entity file at ' . $exception->getPath(), $output, $this->formatter, $this->doctrineTypesMapperFilepath);
+                    $this->outputHelper->outputError('Failed creating the entity file at ' . $exception->getPath(), $output, $this->formatter);
                     return Command::FAILURE;
                 }
             }
